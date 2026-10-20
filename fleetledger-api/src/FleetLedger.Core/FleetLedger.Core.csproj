@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Core não referencia pacote algum: contratos puros (ver CLAUDE.md deste projeto). -->
+
+</Project>

@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/FleetLedger.Api/FleetLedger.Api.csproj" />
+    <Project Path="src/FleetLedger.Core/FleetLedger.Core.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/FleetLedger.Api.Tests/FleetLedger.Api.Tests.csproj" />
+    <Project Path="tests/FleetLedger.Core.Tests/FleetLedger.Core.Tests.csproj" />
+  </Folder>
+</Solution>

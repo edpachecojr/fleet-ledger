@@ -1,0 +1,138 @@
+# `dotnet format` decide o estilo. Discussão de formatação termina aqui.
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+[*.{json,yml,yaml,csproj,props,targets,xml}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.cs]
+
+#### Organização de usings ####
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = false
+csharp_using_directive_placement = outside_namespace:warning
+
+#### Namespace e chaves ####
+csharp_style_namespace_declarations = file_scoped:warning
+csharp_prefer_braces = when_multiline:suggestion
+
+#### var — só quando o tipo é evidente do lado direito ####
+csharp_style_var_for_built_in_types = false:warning
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = false:warning
+
+#### Membros expression-bodied ####
+csharp_style_expression_bodied_methods = when_on_single_line:suggestion
+csharp_style_expression_bodied_properties = true:suggestion
+csharp_style_expression_bodied_accessors = true:suggestion
+
+#### Padrões modernos que reduzem aninhamento ####
+csharp_style_prefer_pattern_matching = true:warning
+csharp_style_prefer_switch_expression = true:warning
+csharp_style_prefer_not_pattern = true:warning
+csharp_style_throw_expression = true:suggestion
+csharp_style_prefer_primary_constructors = true:suggestion
+csharp_prefer_simple_using_statement = true:suggestion
+
+#### Imutabilidade ####
+dotnet_style_readonly_field = true:warning
+csharp_prefer_static_local_function = true:suggestion
+dotnet_style_prefer_auto_properties = true:suggestion
+
+#### Qualificação ####
+dotnet_style_qualification_for_field = false:warning
+dotnet_style_qualification_for_property = false:warning
+dotnet_style_qualification_for_method = false:warning
+dotnet_style_qualification_for_event = false:warning
+
+#### Nomenclatura ####
+dotnet_naming_rule.interfaces_devem_comecar_com_i.severity = error
+dotnet_naming_rule.interfaces_devem_comecar_com_i.symbols = interfaces
+dotnet_naming_rule.interfaces_devem_comecar_com_i.style = prefixo_i
+dotnet_naming_symbols.interfaces.applicable_kinds = interface
+dotnet_naming_style.prefixo_i.required_prefix = I
+dotnet_naming_style.prefixo_i.capitalization = pascal_case
+
+dotnet_naming_rule.campos_privados_com_underscore.severity = warning
+dotnet_naming_rule.campos_privados_com_underscore.symbols = campos_privados
+dotnet_naming_rule.campos_privados_com_underscore.style = underscore_camel
+dotnet_naming_symbols.campos_privados.applicable_kinds = field
+dotnet_naming_symbols.campos_privados.applicable_accessibilities = private
+dotnet_naming_style.underscore_camel.required_prefix = _
+dotnet_naming_style.underscore_camel.capitalization = camel_case
+
+# const e static readonly seguem PascalCase (convenção do C#), mesmo quando privados.
+# Regras com required_modifiers são mais específicas e prevalecem sobre a de campos privados.
+dotnet_naming_rule.constantes_em_pascal.severity = warning
+dotnet_naming_rule.constantes_em_pascal.symbols = constantes
+dotnet_naming_rule.constantes_em_pascal.style = pascal
+dotnet_naming_symbols.constantes.applicable_kinds = field
+dotnet_naming_symbols.constantes.applicable_accessibilities = *
+dotnet_naming_symbols.constantes.required_modifiers = const
+
+dotnet_naming_rule.estaticos_somente_leitura_em_pascal.severity = warning
+dotnet_naming_rule.estaticos_somente_leitura_em_pascal.symbols = estaticos_somente_leitura
+dotnet_naming_rule.estaticos_somente_leitura_em_pascal.style = pascal
+dotnet_naming_symbols.estaticos_somente_leitura.applicable_kinds = field
+dotnet_naming_symbols.estaticos_somente_leitura.applicable_accessibilities = *
+dotnet_naming_symbols.estaticos_somente_leitura.required_modifiers = static, readonly
+
+dotnet_naming_rule.membros_publicos_em_pascal.severity = warning
+dotnet_naming_rule.membros_publicos_em_pascal.symbols = membros_publicos
+dotnet_naming_rule.membros_publicos_em_pascal.style = pascal
+dotnet_naming_symbols.membros_publicos.applicable_kinds = property,method,event,class,struct,enum,delegate
+dotnet_naming_symbols.membros_publicos.applicable_accessibilities = public,internal,protected
+dotnet_naming_style.pascal.capitalization = pascal_case
+
+#### Analisadores elevados a erro ####
+# CA2007 não se aplica: sem SynchronizationContext em ASP.NET Core nem em worker.
+dotnet_diagnostic.CA2007.severity = none
+# Exceção deve preservar a pilha (throw; e não throw ex;).
+dotnet_diagnostic.CA2200.severity = error
+# Não capturar tipos genéricos de exceção sem tratamento.
+dotnet_diagnostic.CA1031.severity = warning
+# Propagar CancellationToken.
+dotnet_diagnostic.CA2016.severity = error
+# Template de log deve ser constante — proíbe interpolação em chamada de log.
+dotnet_diagnostic.CA2254.severity = error
+# Método assíncrono sem await.
+dotnet_diagnostic.CS1998.severity = error
+# Comparação de string sensível a cultura precisa ser explícita.
+dotnet_diagnostic.CA1310.severity = warning
+# Membro público sem XML doc: obrigatório apenas em Core (ver abaixo).
+dotnet_diagnostic.CS1591.severity = none
+
+#### Simplificações que denunciam código legado ####
+dotnet_diagnostic.IDE0005.severity = warning   # using desnecessário
+dotnet_diagnostic.IDE0011.severity = suggestion
+dotnet_diagnostic.IDE0090.severity = suggestion # new() simplificado
+
+# Em Core, todo membro público precisa de documentação.
+[src/*.Core/**/*.cs]
+dotnet_diagnostic.CS1591.severity = warning
+
+# Migrations são geradas: não aplicar as regras de estilo.
+[src/*/Data/Migrations/*.cs]
+generated_code = true
+dotnet_analyzer_diagnostic.severity = none
+
+# Testes: nome de método com underscore é a convenção adotada.
+[tests/**/*.cs]
+dotnet_diagnostic.CA1707.severity = none
+dotnet_diagnostic.CS1591.severity = none
+
+# Logs usam as extensões LogInformation/LogError com message template (docs/engenharia-agentes/03).
+# LoggerMessage gerado só se justifica em caminho quente medido.
+[src/**/*.cs]
+dotnet_diagnostic.CA1848.severity = none
