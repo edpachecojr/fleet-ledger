@@ -13,11 +13,11 @@ Ter o monorepo com backend e frontend mínimos rodando localmente, prontos para 
 - Pipeline de build e testes automatizados executando localmente (e em CI, se aplicável).
 
 ## Critérios de aceite
-- [ ] Um comando documentado sobe backend, frontend e banco localmente.
+- [x] Um comando documentado sobe backend, frontend e banco localmente.
 - [x] O endpoint de saúde retorna sucesso e indica conectividade com o banco.
-- [ ] O frontend carrega o layout base no navegador desktop.
-- [ ] A suíte de testes roda e passa (ao menos um teste de fumaça por projeto).
-- [ ] README com instruções de execução.
+- [x] O frontend carrega o layout base no navegador desktop.
+- [x] A suíte de testes roda e passa (ao menos um teste de fumaça por projeto).
+- [x] README com instruções de execução.
 
 ## Observações
 Detalhes técnicos (stack, ferramentas, padrões) serão definidos pelo time antes do início.

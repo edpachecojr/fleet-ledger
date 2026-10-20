@@ -8,20 +8,20 @@ Arquivo vivo: atualize ao iniciar, concluir ou bloquear uma tarefa, e ao tomar d
 
 | Marco | Tarefas | Concluídas | Status |
 |-------|---------|-----------:|--------|
-| M0 — Fundação | 001–002 | 0/2 | 🟨 |
+| M0 — Fundação | 001–002 | 1/2 | 🟨 |
 | M1 — Cadastros | 003–007 | 0/5 | ⬜ |
 | M2 — Financeiro base | 008–010 | 0/3 | ⬜ |
 | M3 — Viagens | 011–018 | 0/8 | ⬜ |
 | M4 — Faturamento | 019–024 | 0/6 | ⬜ |
 | M5 — Manutenção | 025–027 | 0/3 | ⬜ |
 | M6 — Resultados | 028–032 | 0/5 | ⬜ |
-| **Total** | | **0/32** | |
+| **Total** | | **1/32** | |
 
 ## Tarefas
 
 | ID | Tarefa | Status | Início | Conclusão | Observações |
 |----|--------|--------|--------|-----------|-------------|
-| TASK-001 | Estrutura base da aplicação executável | 🟨 | 2026-10-20 | | Back-end concluído (`fleetledger-api/`); falta o front-end e incluí-lo no `docker compose`. |
+| TASK-001 | Estrutura base da aplicação executável | ✅ | 2026-10-20 | 2026-10-20 | API (`fleetledger-api/`) + backoffice (`fleetledger-backoffice-web/`) + banco com `docker compose up --build`. CI ainda não configurado. |
 | TASK-002 | Login do administrador e proteção de acesso | ⬜ | | | |
 | TASK-003 | Plano de Contas padrão | ⬜ | | | |
 | TASK-004 | Cadastro de veículos | ⬜ | | | |
@@ -75,6 +75,7 @@ Registre aqui as respostas às questões em aberto do [backlog](backlog/README.m
 | 2026-10-20 | ADR 0003 | Isolamento lógico por organização: `IOrganizationOwned` + `ForOrganization` explícito; organização só via `IUserContext`. | todas |
 | 2026-10-20 | ADR 0004 | Testes: só unitários com fakes, sem banco; integração ponta a ponta fica para depois. | todas |
 | 2026-10-20 | ADR 0005 | Contrato HTTP: Minimal API + OpenAPI (Scalar em dev); front-end fora de `fleetledger-api`. | todas |
+| 2026-10-20 | ADR 0006 | Front-end: SPA React 19 + Vite, React Router, TanStack Query, cliente gerado do OpenAPI, design system Backoffice com Tailwind 4; nginx faz proxy de `/api`. | todas |
 
 ## Diário
 
@@ -88,3 +89,5 @@ Registro cronológico do que foi feito, problemas e próximos passos.
 - Observação: o PostgreSQL do compose usa a porta 5433 do host (a 5432 já estava ocupada nesta máquina).
 - Projeto renomeado de "Iowa" para **FleetLedger**, nome descritivo para publicação no GitHub ("fleet" = operação da frota; "ledger" = financeiro). Pasta `fleetledger-api/`, solução `FleetLedger.slnx`, namespaces `FleetLedger.*`, banco/usuário `fleetledger`.
 - **Próximo passo:** front-end da TASK-001 (shell do backoffice) e incluí-lo no compose; depois TASK-002 (emissão do JWT, seed do administrador e da organização).
+- TASK-001 concluída — front-end: `fleetledger-backoffice-web/` (React 19.3, Vite 8, TypeScript 6, Tailwind 4, React Router 8, TanStack Query 5, pnpm). Shell do design system Backoffice (sidebar, header, painel de aparência com modo/cor/densidade/direção, temas claro e escuro), página "Visão geral" com card de status do sistema lendo `GET /health` pelo cliente gerado do OpenAPI. 30 testes Vitest verdes; `docker compose up --build` sobe banco + API + backoffice (http://localhost:3000). Na API, `/health` virou endpoint Minimal API documentado no OpenAPI (status como enum texto, números estritos).
+- **Próximo passo:** TASK-002 — emissão do JWT, seed do administrador e da organização, tela de login e `AccessTokenSource` da sessão no backoffice.
