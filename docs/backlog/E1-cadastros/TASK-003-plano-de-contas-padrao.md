@@ -29,4 +29,4 @@ Disponibilizar um Plano de Contas fixo e inflexível, base de classificação de
 - [ ] As listas de seleção de contas filtram corretamente por contexto de uso.
 
 ## Observações
-A lista definitiva de contas deve ser validada com o gestor antes da implementação.
+Lista de contas acima aprovada pelo gestor (*Q9*).

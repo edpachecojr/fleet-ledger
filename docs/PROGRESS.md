@@ -60,7 +60,16 @@ Registre aqui as respostas às questões em aberto do [backlog](backlog/README.m
 
 | Data | Ref. | Decisão | Tarefas afetadas |
 |------|------|---------|------------------|
-| | | | |
+| 2026-10-20 | Q1 | Motorista com CNH/toxicológico vencido gera **apenas aviso** na abertura da viagem (sem bloqueio). | 007, 011 |
+| 2026-10-20 | Q2 | Viagem fechada (não faturada) **não pode ser reaberta** no MVP. | 013, 017 |
+| 2026-10-20 | Q3 | Dias da viagem para rateio = **dias corridos, inclusivos** (dia de saída e dia de chegada contam). | 017, 028 |
+| 2026-10-20 | Q4 | "Veículos ativos" no rateio = veículos **não inativados no mês de competência**, independente do status operacional. | 028 |
+| 2026-10-20 | Q5 | Saldo negativo no acerto gera **crédito da empresa a abater no próximo acerto** do motorista. | 018 |
+| 2026-10-20 | Q6 | Despesa de viagem paga pela **empresa** → título no Contas a Pagar; paga pelo **motorista** → somada no acerto. | 015, 018 |
+| 2026-10-20 | Q7 | Competência da viagem na DRE mensal = **data de fechamento** da viagem. | 030, 032 |
+| 2026-10-20 | Q8 | Despesas fixas **não** são vinculadas a veículo; todas entram no rateio geral. | 010, 028 |
+| 2026-10-20 | Q9 | Plano de Contas adotado conforme a **proposta da TASK-003**. | 003 |
+| 2026-10-20 | Q10 | "Carregamento instantâneo" dos dashboards = **< 1 s** com massa de dados de referência. | 031, 032 |
 
 ## Diário
 
@@ -68,4 +77,5 @@ Registro cronológico do que foi feito, problemas e próximos passos.
 
 ### 2026-10-20
 - Backlog inicial criado a partir da especificação do MVP (32 tarefas, 6 épicos), roadmap em 7 marcos e este arquivo de acompanhamento.
+- Questões em aberto Q1–Q10 decididas: propostas do backlog aceitas pelo gestor (ver Decisões); tarefas afetadas atualizadas.
 - **Próximo passo:** definir os detalhes técnicos e iniciar a TASK-001.

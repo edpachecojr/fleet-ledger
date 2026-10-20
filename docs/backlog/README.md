@@ -21,7 +21,7 @@ A numeração das tarefas (`TASK-NNN`) segue a **ordem sugerida de execução**,
 
 ## Modelo de tarefa
 
-Cada arquivo contém: **Objetivo**, **Escopo**, **Regras de negócio**, **Critérios de aceite** (checklist) e **Dependências**. Itens marcados **a decidir / a validar** dependem de uma decisão listada abaixo.
+Cada arquivo contém: **Objetivo**, **Escopo**, **Regras de negócio**, **Critérios de aceite** (checklist) e **Dependências**. Regras que dependiam de decisão do gestor referenciam a questão correspondente (ex.: *Q3*), listada abaixo.
 
 **Definição de Pronto (DoD)** — uma tarefa só é concluída quando:
 1. Todos os critérios de aceite estão atendidos.
@@ -93,9 +93,11 @@ Cada arquivo contém: **Objetivo**, **Escopo**, **Regras de negócio**, **Crité
 | US17–US19 | 025–027 |
 | US20–US22 | 029, 030, 032 |
 
-## Questões em aberto (validar com o gestor)
+## Questões de produto (decididas)
 
-| # | Questão | Proposta atual | Afeta |
+Todas as propostas abaixo foram **aceitas em 2026-10-20** — registro em [`PROGRESS.md`](../PROGRESS.md#decisões).
+
+| # | Questão | Decisão | Afeta |
 |---|---------|----------------|-------|
 | Q1 | Motorista com CNH/toxicológico vencido: bloquear ou só avisar na abertura da viagem? | Apenas avisar | 007, 011 |
 | Q2 | Viagem fechada (não faturada) pode ser reaberta? | Não no MVP | 013, 017 |

@@ -12,7 +12,8 @@ Calcular o custo fixo diário por veículo e aplicá-lo aos dias de duração de
 - Recalcular o rateio das viagens não faturadas quando houver alteração nas despesas fixas do mês.
 
 ## Regras de negócio
-- "Veículos ativos" = veículos não inativados no mês de competência (independente do status operacional) — **a validar**.
+- "Veículos ativos" = veículos não inativados no mês de competência (independente do status operacional) (*Q4*).
+- Dias da viagem contados de forma corrida e inclusiva (*Q3*); despesas fixas não são vinculadas a veículo (*Q8*).
 - Viagens faturadas mantêm o rateio congelado no momento do faturamento (RNF03).
 - Mês sem veículos ativos ou sem custos fixos → rateio zero.
 

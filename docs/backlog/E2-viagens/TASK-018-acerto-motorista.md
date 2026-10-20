@@ -9,10 +9,11 @@ Apurar o valor exato devido ao motorista e gerar a conta a pagar correspondente.
 - Tela de acerto (resumo em uma única tela) com:
   - Remuneração final (+)
   - Despesas da viagem pagas pelo motorista (+)
+  - Créditos pendentes de acertos anteriores (−)
   - Adiantamentos recebidos (−)
   - **Saldo do acerto**
 - Confirmação do acerto gera título no Contas a Pagar ao motorista (saldo positivo) com vencimento informado.
-- Saldo negativo (motorista deve à empresa): registrar como pendência/abatimento — **tratamento a decidir**.
+- Saldo negativo (motorista deve à empresa): gera crédito da empresa, abatido automaticamente no próximo acerto do motorista (*Q5*).
 - Comprovante/resumo do acerto imprimível.
 
 ## Regras de negócio
@@ -25,3 +26,4 @@ Apurar o valor exato devido ao motorista e gerar a conta a pagar correspondente.
 - [ ] Após o acerto, os itens que o compõem não podem ser alterados.
 - [ ] Desfazer o acerto cancela o título em aberto e libera a edição.
 - [ ] Viagem Aberta não permite acerto.
+- [ ] Acerto com saldo negativo gera crédito que é abatido no acerto seguinte do mesmo motorista.

@@ -14,7 +14,7 @@ Manter o cadastro de motoristas com comissão padrão e controle de vencimento d
 - CPF válido e único; comissão entre 0% e 100%.
 - Alteração da comissão padrão não afeta viagens já abertas.
 - Motoristas inativos não aparecem na abertura de viagem.
-- Documento vencido gera alerta na abertura de viagem (bloqueio ou apenas aviso: **a decidir**).
+- Documento vencido gera apenas **aviso** na abertura de viagem, sem bloqueio (*Q1*).
 
 ## Critérios de aceite
 - [ ] É possível cadastrar, editar e listar motoristas.

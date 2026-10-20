@@ -7,7 +7,7 @@ Consolidar o resultado mensal de cada caminhão, comparando a provisão de manut
 
 ## Escopo
 - Seleção de mês e veículo (ou todos os veículos lado a lado).
-- Consolidação das viagens do mês (critério de competência: data de fechamento da viagem — **a validar**): receita líquida, despesas variáveis, remuneração, provisão, rateio fixo.
+- Consolidação das viagens do mês (critério de competência: data de fechamento da viagem, *Q7*): receita líquida, despesas variáveis, remuneração, provisão, rateio fixo.
 - Bloco comparativo de manutenção: provisão gerada no mês × manutenção efetivamente gasta no mês (títulos de manutenção do veículo) e diferença.
 - Dois resultados: **Resultado econômico** (com provisão) e **Resultado real** (substituindo a provisão pelo gasto real).
 - Indicadores: km rodados no mês, nº de viagens, receita/km, custo/km.

@@ -16,7 +16,8 @@ Encerrar a viagem registrando o hodômetro final, atualizando o veículo e geran
 ## Regras de negócio
 - Hodômetro final > hodômetro inicial; data de chegada ≥ data de saída.
 - A provisão é virtual: aparece na DRE, mas **não** gera título no Contas a Pagar nem movimenta caixa.
-- Regra de contagem de dias da viagem (para rateio): **a decidir** (ex.: dias corridos inclusivos).
+- Dias da viagem (para rateio) = dias corridos, inclusivos: o dia de saída e o de chegada contam (*Q3*).
+- Após fechada, a viagem não pode ser reaberta (*Q2*).
 
 ## Critérios de aceite
 - [ ] Hodômetro 100.000 → 101.500 com taxa R$ 0,30/km gera distância 1.500 km e provisão R$ 450,00.

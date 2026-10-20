@@ -16,7 +16,7 @@ Registrar o início de uma viagem em formato de bloco único, com os dados-base 
 - Um motorista não pode estar em duas viagens abertas simultaneamente.
 - Hodômetro inicial não pode ser menor que o hodômetro atual do veículo.
 - Valor do frete > 0.
-- Aviso (ou bloqueio, conforme decisão da TASK-007) para motorista com documentação vencida.
+- Aviso (sem bloqueio) para motorista com documentação vencida (*Q1*).
 
 ## Critérios de aceite
 - [ ] Viagem aberta com sucesso altera o veículo para Em Viagem.

@@ -15,7 +15,7 @@ Exibir, na tela inicial, os pontos de atenção operacionais da frota de forma i
 - Tela inicial padrão após o login.
 
 ## Regras de negócio
-- Carregamento instantâneo (RNF04): meta de resposta definida pelo time (ex.: < 1 s com volume de dados de referência).
+- Carregamento instantâneo (RNF04): resposta < 1 s com a massa de dados de referência (*Q10*).
 
 ## Critérios de aceite
 - [ ] Todos os indicadores refletem o estado atual dos dados.

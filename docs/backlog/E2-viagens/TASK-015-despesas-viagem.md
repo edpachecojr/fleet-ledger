@@ -13,6 +13,7 @@ Registrar os custos variáveis da rota (combustível, pedágio, chapas etc.) cla
 - Total de despesas por conta no detalhe da viagem.
 
 ## Regras de negócio
+- Regra de "quem pagou" conforme *Q6*.
 - Apenas contas do grupo "Despesas variáveis de viagem".
 - Despesas podem ser lançadas em viagens Abertas ou Fechadas não faturadas.
 
@@ -21,6 +22,3 @@ Registrar os custos variáveis da rota (combustível, pedágio, chapas etc.) cla
 - [ ] Cada despesa respeita a regra de origem do pagamento (empresa → título; motorista → acerto).
 - [ ] O total de despesas da viagem é exibido por conta e no geral.
 - [ ] Contas fora do grupo de despesas variáveis são rejeitadas.
-
-## Observações
-As regras de "quem pagou" precisam ser validadas com o gestor (ver Questões em aberto no README).

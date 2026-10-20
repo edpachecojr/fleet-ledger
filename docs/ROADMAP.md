@@ -117,5 +117,5 @@ M0 Fundação ─► M1 Cadastros ─► M2 Financeiro base ─► M3 Operação
 ## Critério de conclusão do MVP
 - Todas as tarefas concluídas conforme a Definição de Pronto do [backlog](backlog/README.md#modelo-de-tarefa).
 - Todos os RF, RNF e US da especificação cobertos (ver tabela de cobertura no backlog).
-- Questões em aberto (Q1–Q10) decididas e registradas no [PROGRESS.md](PROGRESS.md).
+- Decisões de produto (Q1–Q10) refletidas na implementação — registradas no [PROGRESS.md](PROGRESS.md#decisões).
 - Roteiro de aceite ponta a ponta executado: cadastrar → abrir viagem → adiantar → lançar despesas → fechar → acertar → faturar → receber → registrar manutenção → conferir DRE e dashboard.
