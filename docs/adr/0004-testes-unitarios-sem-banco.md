@@ -3,7 +3,7 @@
 **Data:** 2026-10-20 · **Status:** aceito
 
 ## Contexto
-O guia (`docs/engenharia-agentes/04-testes.md`) sugere SQLite in-memory, que diverge do PostgreSQL (`snake_case`, `timestamptz`, `uuid`). A equipe prefere, neste momento, só testes unitários.
+A referência de arquitetura adotada sugere SQLite in-memory para testes de handler, que diverge do PostgreSQL (`snake_case`, `timestamptz`, `uuid`). A equipe prefere, neste momento, só testes unitários.
 
 ## Decisão
 - `dotnet test` roda apenas testes unitários: sem banco, sem rede, sem Docker.

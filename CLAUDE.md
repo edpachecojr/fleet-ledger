@@ -6,13 +6,12 @@ Fleet management MVP for trucking companies: vehicles, drivers, trips, payables/
 
 ```
 docs/
-├── backlog/              tasks (TASK-NNN), one file each
-├── adr/                  architecture decisions — every infra choice lives here
-├── engenharia-agentes/   normative engineering guide (.NET) — consult before deciding any pattern
-├── PROGRESS.md           live implementation state
-└── ROADMAP.md            milestones
-fleetledger-api/                 .NET 10 back-end — rules in fleetledger-api/CLAUDE.md
-docker-compose.yml        local stack (PostgreSQL + API)
+├── backlog/          tasks (TASK-NNN), one file each
+├── adr/              architecture decisions — every infra choice lives here
+├── PROGRESS.md       live implementation state
+└── ROADMAP.md        milestones
+fleetledger-api/      .NET 10 back-end — rules in fleetledger-api/CLAUDE.md
+docker-compose.yml    local stack (PostgreSQL + API)
 ```
 
 The API is UI-agnostic: no front-end lives in `fleetledger-api`. A client, when it exists, gets its own folder and its own `CLAUDE.md`, and talks to the API only through the OpenAPI contract.

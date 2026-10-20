@@ -1,8 +1,8 @@
 # CLAUDE.md — fleetledger-api
 
 Contrato de desenvolvimento do back-end. Complementa o `CLAUDE.md` da raiz, que
-continua valendo integralmente. Regras de origem e justificativas completas em
-`docs/engenharia-agentes/` — consulte antes de decidir qualquer padrão.
+continua valendo integralmente. Decisões de infraestrutura e seus motivos em
+`docs/adr/` — consulte antes de decidir qualquer padrão.
 
 ## O projeto
 
@@ -171,6 +171,7 @@ Isolamento lógico por coluna, explícito, aplicado pela aplicação. A palavra
 8. `tests/` — validador, handler (sucesso, não encontrado, isolamento entre organizações)
 
 **Antes de declarar concluído:** `dotnet build` sem warning · `dotnet test`
-verde · `dotnet format --verify-no-changes` limpo · checklist de
-`docs/engenharia-agentes/templates/checklist-revisao.md` · este arquivo ainda
-verdadeiro · `docs/PROGRESS.md` atualizado.
+verde · `dotnet format --verify-no-changes` limpo · nenhum `catch` sem tipo ou
+sem log, `#region`, `async void`, `DateTime.Now` ou interpolação em log ·
+nenhum arquivo acima de 300 linhas · este arquivo ainda verdadeiro ·
+`docs/PROGRESS.md` atualizado.
