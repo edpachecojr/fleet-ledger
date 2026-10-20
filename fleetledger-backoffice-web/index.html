@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>FleetLedger · Backoffice</title>
+    <!-- Aplica tema, cor e densidade salvos antes da primeira pintura (evita piscar).
+         Lê a mesma chave que src/design-system/theme/themeSettingsStore.ts persiste. -->
+    <script>
+      ;(function () {
+        try {
+          var s = JSON.parse(localStorage.getItem('fleetledger-theme-settings') || '{}').state || {}
+          var mode = s.colorMode || 'system'
+          var dark =
+            mode === 'dark' || (mode === 'system' && matchMedia('(prefers-color-scheme: dark)').matches)
+          var html = document.documentElement
+          html.classList.toggle('dark', dark)
+          html.dataset.theme = dark ? 'dark' : 'light'
+          html.dataset.accent = s.accent || 'teal'
+          html.dataset.density = s.density || 'default'
+          html.dir = s.rtl ? 'rtl' : 'ltr'
+        } catch (e) {}
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

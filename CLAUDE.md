@@ -10,11 +10,12 @@ docs/
 ├── adr/              architecture decisions — every infra choice lives here
 ├── PROGRESS.md       live implementation state
 └── ROADMAP.md        milestones
-fleetledger-api/      .NET 10 back-end — rules in fleetledger-api/CLAUDE.md
-docker-compose.yml    local stack (PostgreSQL + API)
+fleetledger-api/                .NET 10 back-end — rules in fleetledger-api/CLAUDE.md
+fleetledger-backoffice-web/     React back-office (Vite SPA) — rules in fleetledger-backoffice-web/CLAUDE.md
+docker-compose.yml              local stack (PostgreSQL + API + back-office)
 ```
 
-The API is UI-agnostic: no front-end lives in `fleetledger-api`. A client, when it exists, gets its own folder and its own `CLAUDE.md`, and talks to the API only through the OpenAPI contract.
+The API is UI-agnostic: no front-end lives in `fleetledger-api`. Each client has its own folder and its own `CLAUDE.md`, and talks to the API only through the OpenAPI contract (types generated from `/openapi/v1.json`, never hand-written).
 
 ## Workflow
 
@@ -48,7 +49,7 @@ The API is UI-agnostic: no front-end lives in `fleetledger-api`. A client, when 
 
 ## Tests
 
-- Tests run with a single command: `dotnet test` inside `fleetledger-api/`.
+- Tests run with a single command per project: `dotnet test` in `fleetledger-api/`, `pnpm test` in `fleetledger-backoffice-web/`.
 - Every new function gets a test. Bug fixes get a regression test.
 - Mock external I/O (API, DB, filesystem) with named fake classes,
   not inline stubs.
@@ -68,7 +69,7 @@ The API is UI-agnostic: no front-end lives in `fleetledger-api`. A client, when 
 
 ## Formatting
 
-- Use `dotnet format`. Don't discuss style beyond that.
+- Use `dotnet format` (API) and `pnpm format` / Prettier (web). Don't discuss style beyond that.
 
 ## Logging
 

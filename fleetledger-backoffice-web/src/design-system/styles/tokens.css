@@ -1,0 +1,176 @@
+/* Tokens do design system Backoffice — valores exatos do guia de implementação.
+   Componentes usam os nomes (bg-surface, text-text-secondary…), nunca hex solto. */
+
+:root {
+  --accent-h: 170;
+  --font-outfit: 'Outfit Variable';
+  --font-jetbrains: 'JetBrains Mono Variable';
+
+  --primary: oklch(0.58 0.17 var(--accent-h));
+  --primary-lighter: oklch(0.92 0.04 var(--accent-h));
+  --primary-darker: oklch(0.42 0.14 var(--accent-h));
+  --primary-soft: oklch(0.92 0.04 var(--accent-h));
+  --on-primary: #ffffff;
+  --on-primary-soft: oklch(0.42 0.14 var(--accent-h));
+  --bg: #f9fafb;
+  --surface: #ffffff;
+  --surface-hover: #f4f6f8;
+  --text-primary: #1c252e;
+  --text-secondary: #637381;
+  --text-disabled: #919eab;
+  --divider: rgba(145, 158, 171, 0.2);
+  --border-input: rgba(145, 158, 171, 0.32);
+  --neutral-soft: rgba(145, 158, 171, 0.08);
+  --sidebar-bg: #1c252e;
+  --sidebar-text: #919eab;
+  --sidebar-text-active: #ffffff;
+  --sidebar-label: #637381;
+  --sidebar-active-bg: oklch(0.65 0.17 var(--accent-h) / 0.08);
+  --sidebar-hover-bg: rgba(145, 158, 171, 0.08);
+  --sidebar-border: rgba(145, 158, 171, 0.16);
+  --header-bg: rgba(255, 255, 255, 0.8);
+  --overlay: rgba(20, 26, 33, 0.48);
+  --hero-from: oklch(0.42 0.14 var(--accent-h));
+  --hero-via: oklch(0.3 0.06 calc(var(--accent-h) + 10));
+  --hero-to: #1c252e;
+  --on-hero: #ffffff;
+  --success: #22c55e;
+  --success-soft: rgba(34, 197, 94, 0.16);
+  --success-text: #166534;
+  --info: #3b82f6;
+  --info-soft: rgba(59, 130, 246, 0.16);
+  --info-text: #1d4ed8;
+  --warning: #f59e0b;
+  --warning-soft: rgba(245, 158, 11, 0.16);
+  --warning-text: #92400e;
+  --error: #ef4444;
+  --error-soft: rgba(239, 68, 68, 0.16);
+  --error-text: #b91c1c;
+  --error-strong: #dc2626;
+  --violet: #8b5cf6;
+  --violet-soft: rgba(139, 92, 246, 0.16);
+  --violet-text: #6d28d9;
+  --chart-1: var(--primary);
+  --chart-2: #168691;
+  --chart-3: #4974be;
+  --chart-4: #6865c0;
+  --chart-5: #f59e0b;
+  --chart-grid: rgba(145, 158, 171, 0.2);
+  --shadow-card: 0 0 2px 0 rgba(145, 158, 171, 0.2), 0 12px 24px -4px rgba(145, 158, 171, 0.12);
+  --shadow-dropdown: 0 0 2px 0 rgba(145, 158, 171, 0.24), -20px 20px 40px -4px rgba(145, 158, 171, 0.24);
+  --shadow-drawer: -40px 40px 80px -8px rgba(145, 158, 171, 0.24);
+  --shadow-dialog: -40px 40px 80px -8px rgba(0, 0, 0, 0.24);
+  --shadow-primary: 0 8px 16px 0 rgba(0, 167, 111, 0.24);
+  --sidebar-width: 256px;
+  --header-height: 58px;
+  --drawer-width: 360px;
+  --density: 1;
+}
+
+.dark,
+[data-theme='dark'] {
+  --primary: oklch(0.65 0.17 var(--accent-h));
+  --primary-lighter: oklch(0.25 0.06 var(--accent-h));
+  --primary-darker: oklch(0.5 0.14 var(--accent-h));
+  --bg: #141a21;
+  --surface: #1c252e;
+  --surface-hover: #252f3a;
+  --text-primary: #ffffff;
+  --text-secondary: #919eab;
+  --text-disabled: #637381;
+  --divider: rgba(145, 158, 171, 0.16);
+  --header-bg: rgba(20, 26, 33, 0.8);
+  --overlay: rgba(0, 0, 0, 0.56);
+  --success-text: #4ade80;
+  --info-text: #60a5fa;
+  --warning-text: #fbbf24;
+  --error-text: #f87171;
+  --violet-text: #a78bfa;
+  --chart-grid: rgba(145, 158, 171, 0.16);
+  --shadow-card: 0 0 2px 0 rgba(0, 0, 0, 0.2), 0 12px 24px -4px rgba(0, 0, 0, 0.12);
+  --shadow-dropdown: 0 0 2px 0 rgba(0, 0, 0, 0.24), -20px 20px 40px -4px rgba(0, 0, 0, 0.24);
+  --shadow-drawer: -40px 40px 80px -8px rgba(0, 0, 0, 0.24);
+}
+
+[data-accent='teal'] {
+  --accent-h: 170;
+}
+[data-accent='blue'] {
+  --accent-h: 259.8;
+}
+[data-accent='purple'] {
+  --accent-h: 292.7;
+}
+[data-accent='orange'] {
+  --accent-h: 47.6;
+}
+[data-accent='rose'] {
+  --accent-h: 16.4;
+}
+[data-accent='emerald'] {
+  --accent-h: 162.5;
+}
+
+[data-density='compact'] {
+  --density: 0.85;
+}
+[data-density='spacious'] {
+  --density: 1.15;
+}
+
+@theme inline {
+  --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+
+  --color-primary: var(--primary);
+  --color-primary-lighter: var(--primary-lighter);
+  --color-primary-darker: var(--primary-darker);
+  --color-primary-soft: var(--primary-soft);
+  --color-on-primary: var(--on-primary);
+  --color-on-primary-soft: var(--on-primary-soft);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-disabled: var(--text-disabled);
+  --color-divider: var(--divider);
+  --color-border-input: var(--border-input);
+  --color-neutral-soft: var(--neutral-soft);
+  --color-sidebar-bg: var(--sidebar-bg);
+  --color-sidebar-text: var(--sidebar-text);
+  --color-sidebar-text-active: var(--sidebar-text-active);
+  --color-sidebar-label: var(--sidebar-label);
+  --color-sidebar-active-bg: var(--sidebar-active-bg);
+  --color-sidebar-hover-bg: var(--sidebar-hover-bg);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-header-bg: var(--header-bg);
+  --color-overlay: var(--overlay);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-success-text: var(--success-text);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-info-text: var(--info-text);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-text: var(--warning-text);
+  --color-error: var(--error);
+  --color-error-soft: var(--error-soft);
+  --color-error-text: var(--error-text);
+  --color-error-strong: var(--error-strong);
+  --color-violet: var(--violet);
+  --color-violet-soft: var(--violet-soft);
+  --color-violet-text: var(--violet-text);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+}
