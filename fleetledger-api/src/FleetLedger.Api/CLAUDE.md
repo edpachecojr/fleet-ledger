@@ -8,12 +8,12 @@ Complementa `fleetledger-api/CLAUDE.md`.
 Program.cs                 lista de intenções: só chama Add*/Use*
 Common/Api/                IEndpoint, MapEndpoint, ValidationFilter, AddValidators,
                            CORS, contrato HTTP (OpenAPI, JSON, ProblemDetails)
-Common/Health/             /health com verificação do banco
+Common/Health/             health checks registrados e contrato da resposta
 Common/Observability/      Serilog + OpenTelemetry
 Common/Security/           Identity, JWT, GetUserId, UserContext
 Data/                      AppDbContext, convenções de modelo, ForOrganization,
                            Mappings/, Migrations/ (geradas — não editar à mão)
-Endpoints/                 EndpointMapper + <Modulo>/ (um arquivo por rota)
+Endpoints/                 EndpointMapper + <Modulo>/ (um arquivo por rota; Health/ é o molde)
 Handlers/<Modulo>/         regra de negócio (criada no primeiro módulo)
 Models/                    SOMENTE entidades acopladas à infra (User : IdentityUser)
 Options/                   Options + validador de cada seção de configuração
