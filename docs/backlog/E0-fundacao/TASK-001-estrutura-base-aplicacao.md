@@ -14,7 +14,7 @@ Ter o monorepo com backend e frontend mínimos rodando localmente, prontos para 
 
 ## Critérios de aceite
 - [ ] Um comando documentado sobe backend, frontend e banco localmente.
-- [ ] O endpoint de saúde retorna sucesso e indica conectividade com o banco.
+- [x] O endpoint de saúde retorna sucesso e indica conectividade com o banco.
 - [ ] O frontend carrega o layout base no navegador desktop.
 - [ ] A suíte de testes roda e passa (ao menos um teste de fumaça por projeto).
 - [ ] README com instruções de execução.

@@ -8,7 +8,7 @@ Arquivo vivo: atualize ao iniciar, concluir ou bloquear uma tarefa, e ao tomar d
 
 | Marco | Tarefas | Concluídas | Status |
 |-------|---------|-----------:|--------|
-| M0 — Fundação | 001–002 | 0/2 | ⬜ |
+| M0 — Fundação | 001–002 | 0/2 | 🟨 |
 | M1 — Cadastros | 003–007 | 0/5 | ⬜ |
 | M2 — Financeiro base | 008–010 | 0/3 | ⬜ |
 | M3 — Viagens | 011–018 | 0/8 | ⬜ |
@@ -21,7 +21,7 @@ Arquivo vivo: atualize ao iniciar, concluir ou bloquear uma tarefa, e ao tomar d
 
 | ID | Tarefa | Status | Início | Conclusão | Observações |
 |----|--------|--------|--------|-----------|-------------|
-| TASK-001 | Estrutura base da aplicação executável | ⬜ | | | |
+| TASK-001 | Estrutura base da aplicação executável | 🟨 | 2026-10-20 | | Back-end concluído (`fleetledger-api/`); falta o front-end e incluí-lo no `docker compose`. |
 | TASK-002 | Login do administrador e proteção de acesso | ⬜ | | | |
 | TASK-003 | Plano de Contas padrão | ⬜ | | | |
 | TASK-004 | Cadastro de veículos | ⬜ | | | |
@@ -70,6 +70,11 @@ Registre aqui as respostas às questões em aberto do [backlog](backlog/README.m
 | 2026-10-20 | Q8 | Despesas fixas **não** são vinculadas a veículo; todas entram no rateio geral. | 010, 028 |
 | 2026-10-20 | Q9 | Plano de Contas adotado conforme a **proposta da TASK-003**. | 003 |
 | 2026-10-20 | Q10 | "Carregamento instantâneo" dos dashboards = **< 1 s** com massa de dados de referência. | 031, 032 |
+| 2026-10-20 | ADR 0001 | Persistência: PostgreSQL + EF Core, `snake_case`, Id UUID v7 gerado na aplicação. | 001 |
+| 2026-10-20 | ADR 0002 | Autenticação: ASP.NET Core Identity + JWT bearer; autorização fechada por padrão. | 001, 002 |
+| 2026-10-20 | ADR 0003 | Isolamento lógico por organização: `IOrganizationOwned` + `ForOrganization` explícito; organização só via `IUserContext`. | todas |
+| 2026-10-20 | ADR 0004 | Testes: só unitários com fakes, sem banco; integração ponta a ponta fica para depois. | todas |
+| 2026-10-20 | ADR 0005 | Contrato HTTP: Minimal API + OpenAPI (Scalar em dev); front-end fora de `fleetledger-api`. | todas |
 
 ## Diário
 
@@ -79,3 +84,7 @@ Registro cronológico do que foi feito, problemas e próximos passos.
 - Backlog inicial criado a partir da especificação do MVP (32 tarefas, 6 épicos), roadmap em 7 marcos e este arquivo de acompanhamento.
 - Questões em aberto Q1–Q10 decididas: propostas do backlog aceitas pelo gestor (ver Decisões); tarefas afetadas atualizadas.
 - **Próximo passo:** definir os detalhes técnicos e iniciar a TASK-001.
+- TASK-001 iniciada — back-end: solução `fleetledger-api/` (.NET 10, `FleetLedger.Core` + `FleetLedger.Api` + testes unitários), PostgreSQL + EF Core com migration `InitialSchema` (`organizations` + tabelas do Identity sem prefixo `AspNet`), Identity + JWT, isolamento por organização (`IOrganizationOwned`, `ForOrganization`, `IUserContext` com `HybridCache`), Serilog + OpenTelemetry, OpenAPI + Scalar, `/health` com verificação do banco (200/503). `docker compose up --build` sobe banco + API; `dotnet test` roda 78 testes verdes. Decisões em `docs/adr/0001`–`0005`; regras em `CLAUDE.md` (raiz) e `fleetledger-api/CLAUDE.md`.
+- Observação: o PostgreSQL do compose usa a porta 5433 do host (a 5432 já estava ocupada nesta máquina).
+- Projeto renomeado de "Iowa" para **FleetLedger**, nome descritivo para publicação no GitHub ("fleet" = operação da frota; "ledger" = financeiro). Pasta `fleetledger-api/`, solução `FleetLedger.slnx`, namespaces `FleetLedger.*`, banco/usuário `fleetledger`.
+- **Próximo passo:** front-end da TASK-001 (shell do backoffice) e incluí-lo no compose; depois TASK-002 (emissão do JWT, seed do administrador e da organização).
