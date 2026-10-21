@@ -11,12 +11,14 @@ export const VEHICLE_TABLE_COLUMNS: readonly DataTableColumn<Vehicle>[] = [
   { key: 'model', header: 'Modelo', render: (vehicle) => vehicle.model },
   {
     key: 'capacity',
+    secondary: true,
     header: 'Capacidade',
     align: 'end',
     render: (vehicle) => formatQuantity(vehicle.capacityKg ?? 0, 'kg'),
   },
   {
     key: 'odometer',
+    secondary: true,
     header: 'Hodômetro atual',
     align: 'end',
     render: (vehicle) => formatQuantity(vehicle.currentOdometerKm ?? 0, 'km'),

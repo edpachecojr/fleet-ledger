@@ -13,12 +13,14 @@ const COLUMNS: readonly DataTableColumn<LedgerAccount>[] = [
   {
     key: 'code',
     header: 'Código',
+    widthClass: 'w-28',
     render: (account) => <span className="font-mono text-[13px]">{account.code}</span>,
   },
   { key: 'name', header: 'Conta', render: (account) => <span className="font-medium">{account.name}</span> },
   {
     key: 'entryContext',
     header: 'Lançamento manual',
+    widthClass: 'w-56',
     render: (account) => <EntryContextCell account={account} />,
   },
 ]

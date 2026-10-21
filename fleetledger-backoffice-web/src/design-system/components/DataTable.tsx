@@ -7,6 +7,10 @@ export interface DataTableColumn<TRow> {
   key: string
   header: string
   align?: DataTableAlign
+  /** Coluna secundária: some abaixo de 1024px (card DataTable). */
+  secondary?: boolean
+  /** Largura fixa (classe Tailwind), para alinhar tabelas irmãs, ex.: `w-32`. */
+  widthClass?: string
   render: (row: TRow) => ReactNode
 }
 
@@ -23,6 +27,15 @@ const CELL_EDGE_CLASSES = 'px-4 first:ps-6 last:pe-6'
 const ALIGN_CLASSES: Record<DataTableAlign, string> = {
   start: 'text-start',
   end: 'text-end tabular-nums',
+}
+
+function columnClasses<TRow>(column: DataTableColumn<TRow>): string {
+  return classNames(
+    CELL_EDGE_CLASSES,
+    ALIGN_CLASSES[column.align ?? 'start'],
+    column.secondary && 'hidden lg:table-cell',
+    column.widthClass,
+  )
 }
 
 /**
@@ -58,8 +71,7 @@ function HeaderCell<TRow>({ column }: { column: DataTableColumn<TRow> }): ReactN
       scope="col"
       className={classNames(
         'bg-surface-hover py-3 text-[13px] font-semibold whitespace-nowrap text-text-secondary',
-        CELL_EDGE_CLASSES,
-        ALIGN_CLASSES[column.align ?? 'start'],
+        columnClasses(column),
       )}
     >
       {column.header}
@@ -77,14 +89,7 @@ function BodyRow<TRow>({
   return (
     <tr className="border-b border-dashed border-divider transition-colors last:border-b-0 hover:bg-surface-hover">
       {columns.map((column) => (
-        <td
-          key={column.key}
-          className={classNames(
-            'py-[calc(14px*var(--density))]',
-            CELL_EDGE_CLASSES,
-            ALIGN_CLASSES[column.align ?? 'start'],
-          )}
-        >
+        <td key={column.key} className={classNames('py-[calc(14px*var(--density))]', columnClasses(column))}>
           {column.render(row)}
         </td>
       ))}

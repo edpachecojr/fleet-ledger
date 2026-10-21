@@ -35,4 +35,15 @@ describe('DataTable', () => {
 
     expect(screen.getByRole('cell', { name: '12' })).toHaveClass('text-end', 'tabular-nums')
   })
+
+  it('hides secondary columns below 1024px and applies fixed widths', () => {
+    const columns: DataTableColumn<Fruit>[] = [
+      { key: 'name', header: 'Nome', widthClass: 'w-28', render: (fruit) => fruit.name },
+      { key: 'stock', header: 'Estoque', secondary: true, render: (fruit) => fruit.stock },
+    ]
+    render(<DataTable caption="Frutas" columns={columns} rows={FRUITS} rowKey={(fruit) => fruit.id} />)
+
+    expect(screen.getByRole('columnheader', { name: 'Estoque' })).toHaveClass('hidden', 'lg:table-cell')
+    expect(screen.getByRole('columnheader', { name: 'Nome' })).toHaveClass('w-28')
+  })
 })

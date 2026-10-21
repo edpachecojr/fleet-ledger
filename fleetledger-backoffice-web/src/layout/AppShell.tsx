@@ -24,7 +24,8 @@ export function AppShell(): ReactNode {
             setNavigationOpen(true)
           }}
         />
-        <main className="grid content-start gap-6 p-4 sm:p-6">
+        {/* min-w-0 nos filhos: sem ele, uma tabela larga alarga o card e a página rola de lado. */}
+        <main className="grid content-start gap-6 p-4 sm:p-6 [&>*]:min-w-0">
           <Outlet />
         </main>
       </div>

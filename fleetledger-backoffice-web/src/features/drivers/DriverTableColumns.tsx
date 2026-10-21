@@ -13,12 +13,14 @@ export const DRIVER_TABLE_COLUMNS: readonly DataTableColumn<Driver>[] = [
   { key: 'name', header: 'Motorista', render: (driver) => <DriverNameCell driver={driver} /> },
   {
     key: 'phone',
+    secondary: true,
     header: 'Telefone',
     render: (driver) => <span className="tabular-nums">{formatPhone(driver.phone)}</span>,
   },
-  { key: 'cnh', header: 'CNH', render: (driver) => <CnhCell driver={driver} /> },
+  { key: 'cnh', secondary: true, header: 'CNH', render: (driver) => <CnhCell driver={driver} /> },
   {
     key: 'toxicology',
+    secondary: true,
     header: 'Toxicológico',
     render: (driver) => (
       <span className="tabular-nums">{formatDateOnly(driver.toxicologyExamExpiresOn)}</span>
@@ -26,6 +28,7 @@ export const DRIVER_TABLE_COLUMNS: readonly DataTableColumn<Driver>[] = [
   },
   {
     key: 'commission',
+    secondary: true,
     header: 'Comissão',
     align: 'end',
     render: (driver) => formatPercent(driver.defaultCommissionPercent ?? 0),

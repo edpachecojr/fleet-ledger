@@ -11,6 +11,7 @@ export const CUSTOMER_TABLE_COLUMNS: readonly DataTableColumn<Customer>[] = [
   { key: 'name', header: 'Cliente', render: (customer) => <CustomerNameCell customer={customer} /> },
   {
     key: 'cnpj',
+    secondary: true,
     header: 'CNPJ',
     render: (customer) => <span className="font-mono text-[13px]">{formatCnpj(customer.cnpj)}</span>,
   },
@@ -21,11 +22,17 @@ export const CUSTOMER_TABLE_COLUMNS: readonly DataTableColumn<Customer>[] = [
   },
   {
     key: 'paymentTerm',
+    secondary: true,
     header: 'Prazo',
     align: 'end',
     render: (customer) => formatPaymentTerm(customer.paymentTermDays),
   },
-  { key: 'contact', header: 'Contato', render: (customer) => <ContactCell customer={customer} /> },
+  {
+    key: 'contact',
+    secondary: true,
+    header: 'Contato',
+    render: (customer) => <ContactCell customer={customer} />,
+  },
   {
     key: 'activity',
     header: 'Situação',
