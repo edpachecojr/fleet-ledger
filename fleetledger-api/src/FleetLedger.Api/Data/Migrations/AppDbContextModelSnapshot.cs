@@ -464,6 +464,77 @@ namespace FleetLedger.Api.Data.Migrations
                     b.ToTable("organizations", (string)null);
                 });
 
+            modelBuilder.Entity("FleetLedger.Core.Models.Vehicle", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<int>("CapacityKg")
+                        .HasColumnType("integer")
+                        .HasColumnName("capacity_kg");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasPrecision(6)
+                        .HasColumnType("timestamp(6) with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<int>("CurrentOdometerKm")
+                        .HasColumnType("integer")
+                        .HasColumnName("current_odometer_km");
+
+                    b.Property<DateTimeOffset?>("DeactivatedAt")
+                        .HasPrecision(6)
+                        .HasColumnType("timestamp(6) with time zone")
+                        .HasColumnName("deactivated_at");
+
+                    b.Property<int>("InitialOdometerKm")
+                        .HasColumnType("integer")
+                        .HasColumnName("initial_odometer_km");
+
+                    b.Property<decimal>("MaintenanceProvisionRatePerKm")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("maintenance_provision_rate_per_km");
+
+                    b.Property<string>("Model")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)")
+                        .HasColumnName("model");
+
+                    b.Property<Guid>("OrganizationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("organization_id");
+
+                    b.Property<string>("Plate")
+                        .IsRequired()
+                        .HasMaxLength(7)
+                        .HasColumnType("character varying(7)")
+                        .HasColumnName("plate");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasPrecision(6)
+                        .HasColumnType("timestamp(6) with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_vehicles");
+
+                    b.HasIndex("OrganizationId")
+                        .HasDatabaseName("ix_vehicles_organization_id");
+
+                    b.HasIndex("OrganizationId", "Plate")
+                        .IsUnique()
+                        .HasDatabaseName("ix_vehicles_organization_id_plate");
+
+                    b.ToTable("vehicles", (string)null);
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
@@ -563,6 +634,16 @@ namespace FleetLedger.Api.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_ledger_accounts_ledger_account_groups_group_id");
+                });
+
+            modelBuilder.Entity("FleetLedger.Core.Models.Vehicle", b =>
+                {
+                    b.HasOne("FleetLedger.Core.Models.Organization", null)
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_vehicles_organizations_organization_id");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>

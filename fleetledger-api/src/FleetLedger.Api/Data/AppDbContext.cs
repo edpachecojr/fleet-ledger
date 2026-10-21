@@ -13,6 +13,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<Organization> Organizations => Set<Organization>();
     public DbSet<LedgerAccountGroup> LedgerAccountGroups => Set<LedgerAccountGroup>();
     public DbSet<LedgerAccount> LedgerAccounts => Set<LedgerAccount>();
+    public DbSet<Vehicle> Vehicles => Set<Vehicle>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

@@ -1,6 +1,9 @@
 import type { RouteObject } from 'react-router'
 import { ChartOfAccountsPage } from '@/features/chart-of-accounts/ChartOfAccountsPage'
 import { LoginPage } from '@/features/login/LoginPage'
+import { NewVehiclePage } from '@/features/vehicles/NewVehiclePage'
+import { VehicleDetailPage } from '@/features/vehicles/VehicleDetailPage'
+import { VehiclesPage } from '@/features/vehicles/VehiclesPage'
 import { OverviewPage } from '@/features/overview/OverviewPage'
 import { NotFoundPage } from '@/features/not-found/NotFoundPage'
 import { AppShell } from '@/layout/AppShell'
@@ -20,6 +23,9 @@ export const APP_ROUTES: RouteObject[] = [
     children: [
       { index: true, element: <OverviewPage /> },
       { path: RoutePath.chartOfAccounts, element: <ChartOfAccountsPage /> },
+      { path: RoutePath.vehicles, element: <VehiclesPage /> },
+      { path: RoutePath.newVehicle, element: <NewVehiclePage /> },
+      { path: RoutePath.vehicleDetail, element: <VehicleDetailPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },

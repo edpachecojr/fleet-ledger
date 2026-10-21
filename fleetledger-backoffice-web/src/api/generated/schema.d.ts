@@ -81,12 +81,119 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/vehicles': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Lista veículos com busca por placa ou modelo
+     * @description allocatable=true devolve só os elegíveis para nova viagem (ativos e disponíveis).
+     */
+    get: operations['Vehicles: List']
+    put?: never
+    /** Cadastra um veículo, com status inicial Disponível */
+    post: operations['Vehicles: Create']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/vehicles/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detalha um veículo */
+    get: operations['Vehicles: Get']
+    /**
+     * Altera modelo, capacidade e taxa de provisão de um veículo
+     * @description Placa e hodômetro não são editáveis.
+     */
+    put: operations['Vehicles: Update']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/vehicles/{id}/deactivate': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Inativa o veículo; ele sai das seleções e do rateio */
+    post: operations['Vehicles: Deactivate']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/vehicles/{id}/reactivate': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Reativa o veículo, mantendo o status operacional */
+    post: operations['Vehicles: Reactivate']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
 export type webhooks = Record<string, never>
 export interface components {
   schemas: {
+    /**
+     * @description Cadastro de veículo. O hodômetro atual nasce igual ao inicial.
+     * @example ```new CreateVehicleRequest { Plate = "ABC1D23", Model = "Volvo FH 540", CapacityKg = 27000 }```
+     */
+    CreateVehicleRequest: {
+      /** @description Placa no formato antigo ou Mercosul; hífen e minúsculas são aceitos. */
+      plate?: string
+      /** @description Marca e modelo. */
+      model?: string
+      /**
+       * Format: int32
+       * @description Capacidade de carga, em kg (maior que zero).
+       */
+      capacityKg?: number
+      /**
+       * Format: int32
+       * @description Hodômetro no cadastro, em km (zero ou mais).
+       */
+      initialOdometerKm?: number
+      /**
+       * Format: double
+       * @description Provisão de manutenção em R$/km, com até 2 casas (zero ou mais).
+       */
+      maintenanceProvisionRatePerKm?: number
+    }
     /** @enum {unknown} */
     ELedgerEntryContext: 'Trip' | 'FixedExpense' | 'Maintenance' | 'Billing' | null
+    /**
+     * @description Status operacional do veículo. EVehicleStatus.OnTrip só é definido pelo sistema
+     *     (abertura, fechamento e cancelamento de viagem), nunca manualmente.
+     * @enum {unknown}
+     */
+    EVehicleStatus: 'Available' | 'OnTrip' | 'InMaintenance'
     HealthCheckEntryResponse: {
       name: string
       status: components['schemas']['HealthStatus']
@@ -198,6 +305,42 @@ export interface components {
       /** @description Senha em texto, só em trânsito (HTTPS); nunca é registrada em log. */
       password?: string
     }
+    /**
+     * @description Resposta de listagem com os metadados de página.
+     * @example ```return new PagedResponse&lt;List&lt;Vehicle&gt;&gt;(vehicles, totalCount, request.PageNumber, request.PageSize);```
+     */
+    PagedResponseOfListOfVehicle: {
+      /**
+       * Format: int32
+       * @description Página devolvida, a partir de 1.
+       */
+      currentPage?: number
+      /**
+       * Format: int32
+       * @description Itens por página usados na consulta.
+       */
+      pageSize?: number
+      /**
+       * Format: int32
+       * @description Total de itens disponíveis em todas as páginas.
+       */
+      totalCount?: number
+      /**
+       * Format: int32
+       * @description Total de páginas; zero quando int PagedResponse&lt;TData&gt;.PageSize não é positivo.
+       */
+      totalPages?: number
+      /** @description Carga útil; nula em respostas de erro. */
+      data?: null | components['schemas']['Vehicle'][]
+      /** @description Mensagem para o usuário. Como exibi-la é decisão do cliente. */
+      message?: null | string
+      /**
+       * Format: int32
+       * @description Status HTTP da operação. Precisa ser público e serializado: o cliente depende dele
+       *     e, sem ele, bool Response&lt;TData&gt;.IsSuccess mente depois da desserialização (antipadrão A-02).
+       */
+      code?: number
+    }
     ProblemDetails: {
       type?: null | string
       title?: null | string
@@ -255,6 +398,100 @@ export interface components {
        *     e, sem ele, bool Response&lt;TData&gt;.IsSuccess mente depois da desserialização (antipadrão A-02).
        */
       code?: number
+    }
+    /**
+     * @description Envelope único de retorno das operações. int Response&lt;TData&gt;.Code é o status HTTP calculado
+     *     pelo handler e devolvido tal qual pelo endpoint.
+     * @example ```return new Response&lt;Vehicle?&gt;(null, 404, "Veículo não encontrado");```
+     */
+    ResponseOfVehicle: {
+      data?: null | components['schemas']['Vehicle']
+      /** @description Mensagem para o usuário. Como exibi-la é decisão do cliente. */
+      message?: null | string
+      /**
+       * Format: int32
+       * @description Status HTTP da operação. Precisa ser público e serializado: o cliente depende dele
+       *     e, sem ele, bool Response&lt;TData&gt;.IsSuccess mente depois da desserialização (antipadrão A-02).
+       */
+      code?: number
+    }
+    /**
+     * @description Edição do cadastro. Placa e hodômetros não são editáveis: a placa é a identidade do
+     *     veículo e o hodômetro atual só muda pelo sistema.
+     * @example ```new UpdateVehicleRequest { Model = "Volvo FH 540", CapacityKg = 27000, MaintenanceProvisionRatePerKm = 0.15m }```
+     */
+    UpdateVehicleRequest: {
+      /** @description Marca e modelo. */
+      model?: string
+      /**
+       * Format: int32
+       * @description Capacidade de carga, em kg (maior que zero).
+       */
+      capacityKg?: number
+      /**
+       * Format: double
+       * @description Provisão de manutenção em R$/km, com até 2 casas; vale para viagens fechadas depois.
+       */
+      maintenanceProvisionRatePerKm?: number
+    }
+    /**
+     * @description Veículo da frota. O hodômetro atual começa igual ao inicial e depois só o sistema o
+     *     altera (fechamento de viagem, registro de manutenção), nunca a edição do cadastro.
+     * @example ```new Vehicle { Plate = "ABC1D23", Model = "Volvo FH 540", CapacityKg = 27000 }```
+     */
+    Vehicle: {
+      /** Format: uuid */
+      organizationId?: string
+      /** @description Placa normalizada (maiúsculas, sem hífen): "ABC1234" ou "ABC1D23". Imutável. */
+      plate?: string
+      /** @description Marca e modelo, como o gestor identifica o veículo. */
+      model?: string
+      /**
+       * Format: int32
+       * @description Capacidade de carga, em quilogramas.
+       */
+      capacityKg?: number
+      /**
+       * Format: int32
+       * @description Hodômetro no cadastro, em km. Não muda depois.
+       */
+      initialOdometerKm?: number
+      /**
+       * Format: int32
+       * @description Hodômetro atual, em km. Atualizado só pelo sistema.
+       */
+      currentOdometerKm?: number
+      /**
+       * Format: double
+       * @description Provisão de manutenção em R$ por km rodado (2 casas). Alterar vale só para viagens
+       *     fechadas depois da alteração.
+       */
+      maintenanceProvisionRatePerKm?: number
+      /** @description Status operacional; começa em EVehicleStatus.Available. */
+      status?: components['schemas']['EVehicleStatus']
+      /**
+       * Format: date-time
+       * @description Momento (UTC) da inativação; nulo enquanto o veículo está ativo.
+       */
+      deactivatedAt?: null | string
+      /** @description Veículo ativo: aparece nas seleções e entra no rateio de custo fixo. */
+      isActive?: boolean
+      /**
+       * Format: uuid
+       * @description UUID v7, gerado na aplicação e nunca pelo banco: a ordem temporal mantém o índice
+       *     da chave primária compacto e o id existe antes do primeiro `SaveChanges`.
+       */
+      id?: string
+      /**
+       * Format: date-time
+       * @description Momento da criação, em UTC. Atribuído explicitamente por quem cria a entidade.
+       */
+      createdAt?: string
+      /**
+       * Format: date-time
+       * @description Momento da última alteração, em UTC. Atribuído explicitamente por quem altera a entidade.
+       */
+      updatedAt?: string
     }
   }
   responses: never
@@ -383,6 +620,211 @@ export interface operations {
         }
         content: {
           'application/problem+json': components['schemas']['ProblemDetails']
+        }
+      }
+    }
+  }
+  'Vehicles: List': {
+    parameters: {
+      query?: {
+        search?: string
+        isActive?: boolean
+        allocatable?: boolean
+        pageNumber?: number
+        pageSize?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PagedResponseOfListOfVehicle']
+        }
+      }
+    }
+  }
+  'Vehicles: Create': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateVehicleRequest']
+      }
+    }
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfVehicle']
+        }
+      }
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/problem+json': components['schemas']['HttpValidationProblemDetails']
+        }
+      }
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfVehicle']
+        }
+      }
+    }
+  }
+  'Vehicles: Get': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfVehicle']
+        }
+      }
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfVehicle']
+        }
+      }
+    }
+  }
+  'Vehicles: Update': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateVehicleRequest']
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfVehicle']
+        }
+      }
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/problem+json': components['schemas']['HttpValidationProblemDetails']
+        }
+      }
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfVehicle']
+        }
+      }
+    }
+  }
+  'Vehicles: Deactivate': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfVehicle']
+        }
+      }
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfVehicle']
+        }
+      }
+    }
+  }
+  'Vehicles: Reactivate': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfVehicle']
+        }
+      }
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfVehicle']
         }
       }
     }

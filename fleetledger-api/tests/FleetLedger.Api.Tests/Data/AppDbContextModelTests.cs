@@ -18,7 +18,7 @@ public class AppDbContextModelTests
         => _model.GetEntityTypes().Select(entity => entity.GetTableName()).Should()
             .BeEquivalentTo(
                 "organizations", "users", "user_claims", "user_logins", "user_tokens",
-                "ledger_account_groups", "ledger_accounts");
+                "ledger_account_groups", "ledger_accounts", "vehicles");
 
     [Fact]
     public void Columns_ForBaseModel_AreSnakeCase()
@@ -64,6 +64,15 @@ public class AppDbContextModelTests
         Entity<LedgerAccountGroup>().GetSeedData().Should().HaveCount(ChartOfAccountsCatalog.Groups.Count);
         account.FindProperty(nameof(IOrganizationOwned.OrganizationId)).Should().BeNull();
     }
+
+    [Fact]
+    public void Vehicle_PlateIsUniquePerOrganization()
+        => Entity<Vehicle>().GetIndexes().Should().Contain(index =>
+            index.IsUnique && index.GetDatabaseName() == "ix_vehicles_organization_id_plate");
+
+    [Fact]
+    public void Vehicle_IsActiveIsDerivedAndNotStored()
+        => Entity<Vehicle>().FindProperty(nameof(Vehicle.IsActive)).Should().BeNull();
 
     private IEntityType Entity<TEntity>() => _model.FindEntityType(typeof(TEntity))!;
 

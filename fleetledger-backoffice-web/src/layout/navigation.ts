@@ -1,4 +1,4 @@
-import { LayoutGrid, ListTree, type LucideIcon } from 'lucide-react'
+import { LayoutGrid, ListTree, Truck, type LucideIcon } from 'lucide-react'
 import { RoutePath } from '@/app/routePaths'
 
 export interface NavigationItem {
@@ -15,6 +15,7 @@ export interface NavigationSection {
 // Cada módulo entregue acrescenta seu item aqui (ver docs/ROADMAP.md).
 export const NAVIGATION_SECTIONS: readonly NavigationSection[] = [
   { label: 'Dashboards', items: [{ label: 'Visão geral', path: RoutePath.overview, icon: LayoutGrid }] },
+  { label: 'Cadastros', items: [{ label: 'Veículos', path: RoutePath.vehicles, icon: Truck }] },
   {
     label: 'Financeiro',
     items: [{ label: 'Plano de contas', path: RoutePath.chartOfAccounts, icon: ListTree }],
@@ -22,12 +23,22 @@ export const NAVIGATION_SECTIONS: readonly NavigationSection[] = [
 ]
 
 /**
- * Item de menu correspondente à rota atual, usado como título da página no header.
- * @example findNavigationItem('/') // { label: 'Visão geral', ... }
+ * Item de menu correspondente à rota atual (ou à seção dela, como /veiculos/novo),
+ * usado como título da página no header.
+ * @example findNavigationItem('/veiculos/novo') // { label: 'Veículos', ... }
  */
 export function findNavigationItem(
   pathname: string,
   sections: readonly NavigationSection[] = NAVIGATION_SECTIONS,
 ): NavigationItem | undefined {
-  return sections.flatMap((section) => section.items).find((item) => item.path === pathname)
+  return sections.flatMap((section) => section.items).find((item) => isWithinItem(pathname, item.path))
+}
+
+/**
+ * A raiz ("/") só casa com ela mesma; as demais casam também com as subrotas.
+ * @example isWithinItem('/veiculos/123', '/veiculos') // true
+ */
+export function isWithinItem(pathname: string, itemPath: string): boolean {
+  if (itemPath === RoutePath.overview) return pathname === itemPath
+  return pathname === itemPath || pathname.startsWith(`${itemPath}/`)
 }

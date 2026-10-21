@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { NavLink } from 'react-router'
 import { classNames } from '@/design-system/classNames'
+import { RoutePath } from '@/app/routePaths'
 import type { NavigationItem } from './navigation'
 
 interface SidebarNavItemProps {
@@ -15,7 +16,7 @@ export function SidebarNavItem({
   return (
     <NavLink
       to={path}
-      end
+      end={path === RoutePath.overview}
       onClick={onNavigate}
       className={({ isActive }) =>
         classNames(

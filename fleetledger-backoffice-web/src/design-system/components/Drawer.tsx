@@ -1,5 +1,6 @@
-import { useEffect, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { classNames } from '../classNames'
+import { useCloseOnEscape } from '../useCloseOnEscape'
 
 type DrawerSide = 'start' | 'end'
 
@@ -40,17 +41,4 @@ export function Drawer({ open, onClose, side, label, className, children }: Draw
       </div>
     </div>
   )
-}
-
-function useCloseOnEscape(open: boolean, onClose: () => void): void {
-  useEffect(() => {
-    if (!open) return
-    const closeOnEscape = (event: KeyboardEvent): void => {
-      if (event.key === 'Escape') onClose()
-    }
-    window.addEventListener('keydown', closeOnEscape)
-    return () => {
-      window.removeEventListener('keydown', closeOnEscape)
-    }
-  }, [open, onClose])
 }
