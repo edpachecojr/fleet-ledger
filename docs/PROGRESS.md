@@ -26,7 +26,7 @@ Arquivo vivo: atualize ao iniciar, concluir ou bloquear uma tarefa, e ao tomar d
 | TASK-003 | Plano de Contas padrão | ✅ | 2026-10-21 | 2026-10-21 | 7 grupos e 18 contas globais gravados pela migration `AddChartOfAccounts`; `GET /v1/ledger-accounts` (hierarquia) e `GET /v1/ledger-accounts/selectable?entryContext=` (seleção por contexto); tela "Plano de contas" somente leitura. |
 | TASK-004 | Cadastro de veículos | ✅ | 2026-10-21 | 2026-10-21 | CRUD em `/v1/vehicles` (sem DELETE: inativar/reativar), placa antiga/Mercosul única por organização, busca por placa/modelo, `allocatable=true` para seleção de nova viagem; telas `/veiculos`, `/veiculos/novo`, `/veiculos/:id`. |
 | TASK-005 | Status operacional do veículo e bloqueio de alocação | ✅ | 2026-10-21 | 2026-10-21 | `PUT /v1/vehicles/{id}/status` (Disponível ↔ Em manutenção; Em viagem 400; veículo em viagem ou inativo 409), filtro `status` na listagem, `VehicleAllocationRule` reutilizável; ações e badges no backoffice. |
-| TASK-006 | Cadastro de clientes | ⬜ | | | |
+| TASK-006 | Cadastro de clientes | 🟨 | 2026-10-21 | | |
 | TASK-007 | Cadastro de motoristas | ⬜ | | | |
 | TASK-008 | Contas a Pagar: títulos e consulta | ⬜ | | | |
 | TASK-009 | Baixa de títulos do Contas a Pagar | ⬜ | | | |
@@ -92,6 +92,7 @@ Registre aqui as respostas às questões em aberto do [backlog](backlog/README.m
 | 2026-10-21 | TASK-004 | Hodômetro em **km inteiro**; taxa de provisão em **R$/km com 2 casas**; veículo pode ser **inativado em qualquer status** (o status é mantido). | 004, 017, 028 |
 | 2026-10-21 | TASK-005 | Veículo **inativo não muda de status operacional**: reative antes. | 005 |
 | 2026-10-21 | M1 | "Hoje" (vencimentos, datas) é calculado no fuso **America/Sao_Paulo**, configurável na API. | 007, todas |
+| 2026-10-21 | M1 | **CNPJ do cliente e CPF do motorista não são editáveis** depois do cadastro (como a placa). Telefone: DDD + número, guardado só com dígitos (10 ou 11). | 006, 007 |
 
 ## Diário
 
@@ -125,3 +126,5 @@ Registro cronológico do que foi feito, problemas e próximos passos.
 - TASK-005 iniciada.
 - TASK-005 concluída. API: `ChangeVehicleStatusRequest` + validador (só Available/InMaintenance como destino manual), máquina de estados `VehicleStatusTransition` (inativo → 409 "reative antes", em viagem → 409, mesmo status → sem gravar), filtro `status` em `GET /v1/vehicles`. Backoffice: ações "Colocar em manutenção" / "Liberar para uso" no detalhe (nenhuma em viagem ou inativo), filtro de status na lista (`ToolbarFilter`), badge de status com cor de status (verde, azul, âmbar). `dotnet test`: 208 testes; `pnpm test`: 156 testes. Conferido no compose.
 - Critério "veículo Em Manutenção é rejeitado na abertura de viagem (API)": a regra (`VehicleAllocationRule`) e a lista de elegíveis (`allocatable=true`) estão prontas; a recusa no `POST` de viagem entra com a TASK-011, que a reutiliza.
+- Refactor antes dos próximos cadastros: `IDeactivatable` + `ActivityChange` na API; `ActivityToggle`, `FormCard` e `SummaryList` no design system (veículos já usam).
+- TASK-006 iniciada.
