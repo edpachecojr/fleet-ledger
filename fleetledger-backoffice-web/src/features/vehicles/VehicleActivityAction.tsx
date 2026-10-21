@@ -1,88 +1,21 @@
-import { Power, PowerOff } from 'lucide-react'
-import { useState, type ReactNode } from 'react'
-import { Button } from '@/design-system/components/Button'
-import { ConfirmDialog } from '@/design-system/components/ConfirmDialog'
-import { InlineMessage } from '@/design-system/components/InlineMessage'
+import type { ReactNode } from 'react'
+import { ActivityToggle } from '@/design-system/components/ActivityToggle'
 import { useChangeVehicleActivity } from './useVehicleMutations'
 import type { Vehicle } from './vehicle'
 
-/**
- * Inativar pede confirmação (o veículo sai das seleções e do rateio); reativar é direto,
- * porque não tira nada de lugar nenhum.
- */
+/** Inativar (com confirmação) ou reativar o veículo, mantendo o status operacional. */
 export function VehicleActivityAction({ vehicle }: { vehicle: Vehicle }): ReactNode {
-  return vehicle.isActive === false ? (
-    <ReactivateButton vehicle={vehicle} />
-  ) : (
-    <DeactivateAction vehicle={vehicle} />
-  )
-}
-
-function ReactivateButton({ vehicle }: { vehicle: Vehicle }): ReactNode {
   const activity = useChangeVehicleActivity(vehicle.id ?? '')
 
   return (
-    <Button
-      variant="outline"
-      icon={<Power />}
-      disabled={activity.isPending}
-      onClick={() => {
-        activity.mutate('reactivate')
-      }}
-    >
-      Reativar
-    </Button>
-  )
-}
-
-function DeactivateAction({ vehicle }: { vehicle: Vehicle }): ReactNode {
-  const [confirming, setConfirming] = useState(false)
-  const activity = useChangeVehicleActivity(vehicle.id ?? '')
-
-  return (
-    <>
-      <Button
-        variant="outline"
-        icon={<PowerOff />}
-        onClick={() => {
-          setConfirming(true)
-        }}
-      >
-        Inativar
-      </Button>
-      {activity.data?.kind === 'rejected' && (
-        <InlineMessage tone="error">{activity.data.message}</InlineMessage>
-      )}
-      <DeactivationDialog
-        plate={vehicle.plate ?? ''}
-        open={confirming}
-        activity={activity}
-        onClose={() => {
-          setConfirming(false)
-        }}
-      />
-    </>
-  )
-}
-
-interface DeactivationDialogProps {
-  plate: string
-  open: boolean
-  activity: ReturnType<typeof useChangeVehicleActivity>
-  onClose: () => void
-}
-
-function DeactivationDialog({ plate, open, activity, onClose }: DeactivationDialogProps): ReactNode {
-  return (
-    <ConfirmDialog
-      open={open}
-      title="Inativar veículo?"
-      message={<DeactivationWarning plate={plate} />}
-      confirmLabel="Inativar"
+    <ActivityToggle
+      isActive={vehicle.isActive !== false}
+      confirmTitle="Inativar veículo?"
+      consequence={<DeactivationWarning plate={vehicle.plate ?? ''} />}
       pending={activity.isPending}
-      onCancel={onClose}
-      onConfirm={() => {
-        activity.mutate('deactivate', { onSettled: onClose })
+      rejection={activity.data?.kind === 'rejected' ? activity.data.message : null}
+      onChange={(deactivate, done) => {
+        activity.mutate(deactivate ? 'deactivate' : 'reactivate', { onSettled: done })
       }}
     />
   )

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Badge } from '@/design-system/components/Badge'
 import { Card } from '@/design-system/components/Card'
+import { SummaryList, SummaryRow } from '@/design-system/components/SummaryList'
 import { formatQuantity } from '@/design-system/numberFormat'
 import { formatProvisionRate, presentVehicleActivity, presentVehicleStatus, type Vehicle } from './vehicle'
 
@@ -11,7 +12,7 @@ export function VehicleSummaryCard({ vehicle }: { vehicle: Vehicle }): ReactNode
 
   return (
     <Card title="Situação">
-      <dl className="grid">
+      <SummaryList>
         <SummaryRow term="Status operacional">
           <Badge tone={status.tone}>{status.label}</Badge>
         </SummaryRow>
@@ -25,16 +26,7 @@ export function VehicleSummaryCard({ vehicle }: { vehicle: Vehicle }): ReactNode
         <SummaryRow term="Taxa de provisão">
           {formatProvisionRate(vehicle.maintenanceProvisionRatePerKm)}
         </SummaryRow>
-      </dl>
+      </SummaryList>
     </Card>
-  )
-}
-
-function SummaryRow({ term, children }: { term: string; children: ReactNode }): ReactNode {
-  return (
-    <div className="flex items-center justify-between gap-3 border-b border-dashed border-divider py-3 last:border-b-0">
-      <dt className="text-text-secondary">{term}</dt>
-      <dd className="font-semibold tabular-nums">{children}</dd>
-    </div>
   )
 }

@@ -82,18 +82,15 @@ public sealed class VehicleHandler(
     public async Task<Response<Vehicle?>> ReactivateAsync(ByIdRequest request, CancellationToken cancellationToken)
         => await ChangeActivityAsync(request, deactivate: false, cancellationToken);
 
-    // Idempotente: inativar um inativo (ou reativar um ativo) devolve o veículo sem gravar.
+    // Idempotente (ActivityChange): inativar um inativo devolve o veículo sem gravar.
     private async Task<Response<Vehicle?>> ChangeActivityAsync(ByIdRequest request, bool deactivate, CancellationToken cancellationToken)
     {
         Vehicle? vehicle = await store.FindAsync(request.OrganizationId, request.Id, cancellationToken);
         if (vehicle is null)
             return VehicleResponses.NotFound(request.Id);
-        if (vehicle.IsActive != deactivate)
+        if (!ActivityChange.TryApply(vehicle, deactivate, timeProvider.GetUtcNow()))
             return VehicleResponses.Found(vehicle);
 
-        DateTimeOffset now = timeProvider.GetUtcNow();
-        vehicle.DeactivatedAt = deactivate ? now : null;
-        vehicle.UpdatedAt = now;
         await store.SaveChangesAsync(cancellationToken);
 
         logger.LogInformation("Veículo {VehicleId} {VehicleActivity}", vehicle.Id, deactivate ? "inativado" : "reativado");

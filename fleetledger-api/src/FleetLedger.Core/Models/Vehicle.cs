@@ -5,7 +5,7 @@ namespace FleetLedger.Core.Models;
 /// altera (fechamento de viagem, registro de manutenção), nunca a edição do cadastro.
 /// </summary>
 /// <example><code>new Vehicle { Plate = "ABC1D23", Model = "Volvo FH 540", CapacityKg = 27000 }</code></example>
-public sealed class Vehicle : BaseModel, IOrganizationOwned
+public sealed class Vehicle : BaseModel, IOrganizationOwned, IDeactivatable
 {
     /// <inheritdoc />
     public Guid OrganizationId { get; set; }
@@ -34,7 +34,7 @@ public sealed class Vehicle : BaseModel, IOrganizationOwned
     /// <summary>Status operacional; começa em <see cref="EVehicleStatus.Available"/>.</summary>
     public EVehicleStatus Status { get; set; } = EVehicleStatus.Available;
 
-    /// <summary>Momento (UTC) da inativação; nulo enquanto o veículo está ativo.</summary>
+    /// <inheritdoc />
     public DateTimeOffset? DeactivatedAt { get; set; }
 
     /// <summary>Veículo ativo: aparece nas seleções e entra no rateio de custo fixo.</summary>
