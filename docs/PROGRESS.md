@@ -9,13 +9,13 @@ Arquivo vivo: atualize ao iniciar, concluir ou bloquear uma tarefa, e ao tomar d
 | Marco | Tarefas | Concluídas | Status |
 |-------|---------|-----------:|--------|
 | M0 — Fundação | 001–002 | 2/2 | ✅ |
-| M1 — Cadastros | 003–007 | 1/5 | 🟨 |
+| M1 — Cadastros | 003–007 | 2/5 | 🟨 |
 | M2 — Financeiro base | 008–010 | 0/3 | ⬜ |
 | M3 — Viagens | 011–018 | 0/8 | ⬜ |
 | M4 — Faturamento | 019–024 | 0/6 | ⬜ |
 | M5 — Manutenção | 025–027 | 0/3 | ⬜ |
 | M6 — Resultados | 028–032 | 0/5 | ⬜ |
-| **Total** | | **3/32** | |
+| **Total** | | **4/32** | |
 
 ## Tarefas
 
@@ -24,7 +24,7 @@ Arquivo vivo: atualize ao iniciar, concluir ou bloquear uma tarefa, e ao tomar d
 | TASK-001 | Estrutura base da aplicação executável | ✅ | 2026-10-20 | 2026-10-20 | API (`fleetledger-api/`) + backoffice (`fleetledger-backoffice-web/`) + banco com `docker compose up --build`. CI ainda não configurado. |
 | TASK-002 | Login do administrador e proteção de acesso | ✅ | 2026-10-20 | 2026-10-20 | `POST /v1/auth/login` (JWT 8 h, bloqueio 15 min após 5 erros), seed do administrador, tela de login, rotas protegidas, logout e expiração no backoffice. ADR 0007. |
 | TASK-003 | Plano de Contas padrão | ✅ | 2026-10-21 | 2026-10-21 | 7 grupos e 18 contas globais gravados pela migration `AddChartOfAccounts`; `GET /v1/ledger-accounts` (hierarquia) e `GET /v1/ledger-accounts/selectable?entryContext=` (seleção por contexto); tela "Plano de contas" somente leitura. |
-| TASK-004 | Cadastro de veículos | ⬜ | | | |
+| TASK-004 | Cadastro de veículos | ✅ | 2026-10-21 | 2026-10-21 | CRUD em `/v1/vehicles` (sem DELETE: inativar/reativar), placa antiga/Mercosul única por organização, busca por placa/modelo, `allocatable=true` para seleção de nova viagem; telas `/veiculos`, `/veiculos/novo`, `/veiculos/:id`. |
 | TASK-005 | Status operacional do veículo e bloqueio de alocação | ⬜ | | | |
 | TASK-006 | Cadastro de clientes | ⬜ | | | |
 | TASK-007 | Cadastro de motoristas | ⬜ | | | |
@@ -89,6 +89,9 @@ Registre aqui as respostas às questões em aberto do [backlog](backlog/README.m
 | 2026-10-21 | TASK-006 | Cliente: só razão social, CNPJ e ciclo são obrigatórios; nome fantasia, telefone, e-mail e prazo são opcionais (validados quando informados). | 006 |
 | 2026-10-21 | TASK-007 | Motorista: categoria da CNH em lista fixa (A, B, C, D, E, AB, AC, AD, AE), número da CNH com 11 dígitos, telefone obrigatório, dados bancários/PIX em texto livre opcional. Situação documental: **Vencido** se alguma validade < hoje; **Vencendo** se a mais próxima vence entre hoje e hoje+30 dias (inclusive); senão **Regular**; vale o pior documento, calculado no servidor. | 007, 011 |
 | 2026-10-21 | M1 | Cadastro e edição em **páginas próprias** (`/veiculos`, `/veiculos/novo`, `/veiculos/:id`…), formulário num Card como no card FormControls. | 004, 006, 007 |
+| 2026-10-21 | TASK-004 | Hodômetro em **km inteiro**; taxa de provisão em **R$/km com 2 casas**; veículo pode ser **inativado em qualquer status** (o status é mantido). | 004, 017, 028 |
+| 2026-10-21 | TASK-005 | Veículo **inativo não muda de status operacional**: reative antes. | 005 |
+| 2026-10-21 | M1 | "Hoje" (vencimentos, datas) é calculado no fuso **America/Sao_Paulo**, configurável na API. | 007, todas |
 
 ## Diário
 
@@ -116,3 +119,6 @@ Registro cronológico do que foi feito, problemas e próximos passos.
 - TASK-003 concluída. API: `LedgerAccountGroup`/`LedgerAccount` (globais, sem organização) com `ChartOfAccountsCatalog` gravado por `HasData` na migration `AddChartOfAccounts`; contexto de lançamento manual em `ELedgerEntryContext` (nulo = sistêmica). Endpoints só de leitura: `GET /v1/ledger-accounts` e `GET /v1/ledger-accounts/selectable?entryContext=` (POST responde 405). Primeiro módulo com o padrão de store (`ILedgerAccountStore` + `FakeLedgerAccountStore`); `CLAUDE.md` da API atualizado. Backoffice: componente `DataTable` do design system e página "Plano de contas" (um Card por grupo, conta sistêmica com badge "Sistêmica"), item no menu "Financeiro". `dotnet test`: 132 testes; `pnpm test`: 83 testes. Conferido no compose.
 - Correção: parâmetro de query ausente/inválido (`BadHttpRequestException`) respondia 500; agora o `UseExceptionHandler` usa o status da exceção (400). Teste de regressão em `HttpContractExtensionTests`.
 - As listas de seleção de conta no backoffice serão montadas nas telas que lançam (TASK-010, 015, 020, 027), consumindo `/selectable`.
+- TASK-004 iniciada.
+- TASK-004 concluída. API: `Vehicle` (`IOrganizationOwned`, placa normalizada imutável, hodômetro atual só pelo sistema, `DeactivatedAt` + `IsActive` derivado), migration `AddVehicles` com índice único `organization_id + plate`; `VehicleStore` com busca ILIKE escapada (`SearchPattern`) e paginação limitada no servidor (`PagedRequest.Effective*`); `VehicleAllocationRule` (ativo e Disponível) usada pelo filtro `allocatable`; `ByIdRequest` genérico para rotas por id. Backoffice: componentes `TextField` com erro, `SelectField`, `ToolbarSearch`, `TablePagination`, `ConfirmDialog`, `ButtonLink`, `InlineMessage`; `useMutationForm` + `outcomeOf` (400 por campo, 404/409 com mensagem) e `listQuery` (busca, situação, página) para os próximos cadastros; menu "Cadastros › Veículos" ativo também nas subrotas. `dotnet test`: 192 testes; `pnpm test`: 146 testes. Conferido no compose (201, 409, 400 por campo, busca, inativação fora de `allocatable`, DELETE 405).
+- A seleção de veículo na abertura de viagem (TASK-011) vai consumir `GET /v1/vehicles?allocatable=true`.

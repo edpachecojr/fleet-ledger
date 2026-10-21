@@ -43,10 +43,14 @@ src/
 ├── main.tsx                 composição: cria cliente HTTP, query client e router
 ├── index.css                Tailwind + tokens + base
 ├── app/                     rotas (appRoutes), providers, constantes de app
-├── api/                     cliente HTTP, injeção (ApiClientContext), erros
+├── api/                     cliente HTTP, injeção (ApiClientContext), erros, recusas de
+│                            escrita (mutationOutcome), formulário de cadastro
+│                            (useMutationForm), filtros de listagem (listQuery)
 │   └── generated/           schema.d.ts GERADO — nunca editar à mão
 ├── design-system/           tokens, tema, componentes genéricos (sem domínio)
-│   ├── components/          Button, Card, Badge, Drawer, PageHeader, EmptyState…
+│   ├── components/          Button, Card, Badge, DataTable, TextField, SelectField,
+│   │                        ConfirmDialog, TablePagination, PageHeader, EmptyState…
+│   ├── numberFormat.ts      moeda, quantidades e leitura de número em pt-BR
 │   ├── settings/            painel de aparência (modo, cor, densidade, direção)
 │   ├── styles/tokens.css    valores do design system Backoffice
 │   └── theme/               store, applyTheme

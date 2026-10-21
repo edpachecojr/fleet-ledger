@@ -19,8 +19,8 @@ Manter o inventário da frota com os dados necessários para operação e cálcu
 - Alteração da taxa de provisão vale apenas para viagens fechadas após a alteração.
 
 ## Critérios de aceite
-- [ ] É possível cadastrar um veículo com todos os campos e vê-lo na listagem.
-- [ ] Placa duplicada ou inválida é rejeitada com mensagem clara.
-- [ ] A edição permite alterar modelo, capacidade e taxa de provisão, mas não o hodômetro atual.
-- [ ] Inativar um veículo o remove das seleções de nova viagem.
-- [ ] A busca por placa/modelo retorna os veículos correspondentes.
+- [x] É possível cadastrar um veículo com todos os campos e vê-lo na listagem.
+- [x] Placa duplicada ou inválida é rejeitada com mensagem clara.
+- [x] A edição permite alterar modelo, capacidade e taxa de provisão, mas não o hodômetro atual.
+- [x] Inativar um veículo o remove das seleções de nova viagem.
+- [x] A busca por placa/modelo retorna os veículos correspondentes.
