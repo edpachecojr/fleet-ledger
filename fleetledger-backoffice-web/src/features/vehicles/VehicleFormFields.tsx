@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import type { MutationFormState } from '@/api/useMutationForm'
+import { fieldBinding, type MutationFormState } from '@/api/useMutationForm'
 import { TextField } from '@/design-system/components/TextField'
 import type { VehicleFormValues } from './vehicleForm'
 
@@ -26,36 +26,23 @@ export function VehicleFormFields({ form, mode }: VehicleFormFieldsProps): React
         label="Placa"
         disabled={editing}
         help={editing ? LOCKED_PLATE_HELP : PLATE_HELP}
-        {...bindField(form, 'plate')}
+        {...fieldBinding(form, 'plate')}
       />
-      <TextField label="Modelo" {...bindField(form, 'model')} />
-      <TextField label="Capacidade (kg)" inputMode="numeric" {...bindField(form, 'capacityKg')} />
+      <TextField label="Modelo" {...fieldBinding(form, 'model')} />
+      <TextField label="Capacidade (kg)" inputMode="numeric" {...fieldBinding(form, 'capacityKg')} />
       {!editing && (
         <TextField
           label="Hodômetro inicial (km)"
           inputMode="numeric"
-          {...bindField(form, 'initialOdometerKm')}
+          {...fieldBinding(form, 'initialOdometerKm')}
         />
       )}
       <TextField
         label="Taxa de provisão de manutenção (R$/km)"
         inputMode="decimal"
         help="Alterar vale para as viagens fechadas depois da alteração."
-        {...bindField(form, 'maintenanceProvisionRatePerKm')}
+        {...fieldBinding(form, 'maintenanceProvisionRatePerKm')}
       />
     </div>
   )
-}
-
-function bindField(
-  form: MutationFormState<VehicleFormValues>,
-  field: keyof VehicleFormValues,
-): { value: string; error: string | undefined; onChange: (event: { target: { value: string } }) => void } {
-  return {
-    value: form.values[field],
-    error: form.fieldErrors[field],
-    onChange: (event) => {
-      form.setField(field, event.target.value)
-    },
-  }
 }

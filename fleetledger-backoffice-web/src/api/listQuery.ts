@@ -1,3 +1,4 @@
+import type { BadgePresentation } from '@/design-system/components/Badge'
 import type { SelectOption } from '@/design-system/components/SelectField'
 
 // Mesmo valor de PagingDefaults.PageSize na API.
@@ -41,4 +42,15 @@ export function listQueryParams(query: ListQuery): {
 
 export function isActivityFilter(value: string): value is ActivityFilter {
   return ACTIVITY_FILTER_OPTIONS.some((option) => option.value === value)
+}
+
+const ACTIVE: BadgePresentation = { label: 'Ativo', tone: 'success' }
+const INACTIVE: BadgePresentation = { label: 'Inativo', tone: 'neutral' }
+
+/**
+ * Situação do cadastro (card Badge: Ativo em verde, Inativo neutro).
+ * @example presentActivity(false) // { label: 'Inativo', tone: 'neutral' }
+ */
+export function presentActivity(isActive: boolean | undefined): BadgePresentation {
+  return isActive === false ? INACTIVE : ACTIVE
 }

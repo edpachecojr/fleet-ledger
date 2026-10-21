@@ -177,6 +177,82 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/customers': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Lista clientes com busca por razão social, nome fantasia ou CNPJ
+     * @description isActive=true devolve só os selecionáveis em nova viagem.
+     */
+    get: operations['Customers: List']
+    put?: never
+    /** Cadastra um cliente */
+    post: operations['Customers: Create']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/customers/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detalha um cliente */
+    get: operations['Customers: Get']
+    /**
+     * Altera os dados de um cliente
+     * @description O CNPJ não é editável.
+     */
+    put: operations['Customers: Update']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/customers/{id}/deactivate': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Inativa o cliente; ele some da abertura de viagem */
+    post: operations['Customers: Deactivate']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/customers/{id}/reactivate': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Reativa o cliente */
+    post: operations['Customers: Reactivate']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
 export type webhooks = Record<string, never>
 export interface components {
@@ -189,6 +265,29 @@ export interface components {
     ChangeVehicleStatusRequest: {
       /** @description Novo status: EVehicleStatus.Available ou EVehicleStatus.InMaintenance. */
       status?: components['schemas']['EVehicleStatus']
+    }
+    /**
+     * @description Cadastro de cliente. CNPJ e telefone aceitam máscara; são guardados só com dígitos.
+     * @example ```new CreateCustomerRequest { CorporateName = "Agro Sul Ltda", Cnpj = "11.222.333/0001-81", BillingCycle = EBillingCycle.Monthly }```
+     */
+    CreateCustomerRequest: {
+      /** @description Razão social (obrigatória). */
+      corporateName?: string
+      /** @description Nome fantasia (opcional). */
+      tradeName?: null | string
+      /** @description CNPJ com dígitos verificadores válidos, único na organização. */
+      cnpj?: string
+      /** @description Telefone com DDD (opcional). */
+      phone?: null | string
+      /** @description E-mail de contato (opcional). */
+      email?: null | string
+      /** @description Ciclo de faturamento (obrigatório). */
+      billingCycle?: components['schemas']['EBillingCycle']
+      /**
+       * Format: int32
+       * @description Prazo de pagamento em dias (opcional, 1 ou mais).
+       */
+      paymentTermDays?: null | number
     }
     /**
      * @description Cadastro de veículo. O hodômetro atual nasce igual ao inicial.
@@ -215,6 +314,57 @@ export interface components {
        */
       maintenanceProvisionRatePerKm?: number
     }
+    /**
+     * @description Cliente que contrata fretes e recebe as faturas. O CNPJ é a identidade do cadastro e não
+     *     muda depois de criado; com histórico, o cliente só é inativado.
+     * @example ```new Customer { CorporateName = "Agro Sul Ltda", Cnpj = "11222333000181", BillingCycle = EBillingCycle.Monthly }```
+     */
+    Customer: {
+      /** Format: uuid */
+      organizationId?: string
+      /** @description Razão social. */
+      corporateName?: string
+      /** @description Nome fantasia, opcional. */
+      tradeName?: null | string
+      /** @description CNPJ só com os 14 dígitos. Imutável. */
+      cnpj?: string
+      /** @description Telefone de contato só com dígitos (DDD + número), opcional. */
+      phone?: null | string
+      /** @description E-mail de contato, opcional. */
+      email?: null | string
+      /** @description Ciclo de faturamento. */
+      billingCycle?: components['schemas']['EBillingCycle']
+      /**
+       * Format: int32
+       * @description Prazo de pagamento em dias, opcional; sugere o vencimento da fatura.
+       */
+      paymentTermDays?: null | number
+      /** Format: date-time */
+      deactivatedAt?: null | string
+      /** @description Cliente ativo: aparece na abertura de viagem. */
+      isActive?: boolean
+      /**
+       * Format: uuid
+       * @description UUID v7, gerado na aplicação e nunca pelo banco: a ordem temporal mantém o índice
+       *     da chave primária compacto e o id existe antes do primeiro `SaveChanges`.
+       */
+      id?: string
+      /**
+       * Format: date-time
+       * @description Momento da criação, em UTC. Atribuído explicitamente por quem cria a entidade.
+       */
+      createdAt?: string
+      /**
+       * Format: date-time
+       * @description Momento da última alteração, em UTC. Atribuído explicitamente por quem altera a entidade.
+       */
+      updatedAt?: string
+    }
+    /**
+     * @description Periodicidade com que o cliente é faturado.
+     * @enum {unknown}
+     */
+    EBillingCycle: 'Weekly' | 'Biweekly' | 'Monthly'
     /** @enum {unknown} */
     ELedgerEntryContext: 'Trip' | 'FixedExpense' | 'Maintenance' | 'Billing' | null
     /**
@@ -338,6 +488,42 @@ export interface components {
      * @description Resposta de listagem com os metadados de página.
      * @example ```return new PagedResponse&lt;List&lt;Vehicle&gt;&gt;(vehicles, totalCount, request.PageNumber, request.PageSize);```
      */
+    PagedResponseOfListOfCustomer: {
+      /**
+       * Format: int32
+       * @description Página devolvida, a partir de 1.
+       */
+      currentPage?: number
+      /**
+       * Format: int32
+       * @description Itens por página usados na consulta.
+       */
+      pageSize?: number
+      /**
+       * Format: int32
+       * @description Total de itens disponíveis em todas as páginas.
+       */
+      totalCount?: number
+      /**
+       * Format: int32
+       * @description Total de páginas; zero quando int PagedResponse&lt;TData&gt;.PageSize não é positivo.
+       */
+      totalPages?: number
+      /** @description Carga útil; nula em respostas de erro. */
+      data?: null | components['schemas']['Customer'][]
+      /** @description Mensagem para o usuário. Como exibi-la é decisão do cliente. */
+      message?: null | string
+      /**
+       * Format: int32
+       * @description Status HTTP da operação. Precisa ser público e serializado: o cliente depende dele
+       *     e, sem ele, bool Response&lt;TData&gt;.IsSuccess mente depois da desserialização (antipadrão A-02).
+       */
+      code?: number
+    }
+    /**
+     * @description Resposta de listagem com os metadados de página.
+     * @example ```return new PagedResponse&lt;List&lt;Vehicle&gt;&gt;(vehicles, totalCount, request.PageNumber, request.PageSize);```
+     */
     PagedResponseOfListOfVehicle: {
       /**
        * Format: int32
@@ -377,6 +563,22 @@ export interface components {
       status?: null | number
       detail?: null | string
       instance?: null | string
+    }
+    /**
+     * @description Envelope único de retorno das operações. int Response&lt;TData&gt;.Code é o status HTTP calculado
+     *     pelo handler e devolvido tal qual pelo endpoint.
+     * @example ```return new Response&lt;Vehicle?&gt;(null, 404, "Veículo não encontrado");```
+     */
+    ResponseOfCustomer: {
+      data?: null | components['schemas']['Customer']
+      /** @description Mensagem para o usuário. Como exibi-la é decisão do cliente. */
+      message?: null | string
+      /**
+       * Format: int32
+       * @description Status HTTP da operação. Precisa ser público e serializado: o cliente depende dele
+       *     e, sem ele, bool Response&lt;TData&gt;.IsSuccess mente depois da desserialização (antipadrão A-02).
+       */
+      code?: number
     }
     /**
      * @description Envelope único de retorno das operações. int Response&lt;TData&gt;.Code é o status HTTP calculado
@@ -445,6 +647,27 @@ export interface components {
       code?: number
     }
     /**
+     * @description Edição do cliente: tudo menos o CNPJ, que é a identidade do cadastro.
+     * @example ```new UpdateCustomerRequest { CorporateName = "Agro Sul Ltda", BillingCycle = EBillingCycle.Biweekly }```
+     */
+    UpdateCustomerRequest: {
+      /** @description Razão social (obrigatória). */
+      corporateName?: string
+      /** @description Nome fantasia (opcional). */
+      tradeName?: null | string
+      /** @description Telefone com DDD (opcional). */
+      phone?: null | string
+      /** @description E-mail de contato (opcional). */
+      email?: null | string
+      /** @description Ciclo de faturamento (obrigatório). */
+      billingCycle?: components['schemas']['EBillingCycle']
+      /**
+       * Format: int32
+       * @description Prazo de pagamento em dias (opcional, 1 ou mais).
+       */
+      paymentTermDays?: null | number
+    }
+    /**
      * @description Edição do cadastro. Placa e hodômetros não são editáveis: a placa é a identidade do
      *     veículo e o hodômetro atual só muda pelo sistema.
      * @example ```new UpdateVehicleRequest { Model = "Volvo FH 540", CapacityKg = 27000, MaintenanceProvisionRatePerKm = 0.15m }```
@@ -498,10 +721,7 @@ export interface components {
       maintenanceProvisionRatePerKm?: number
       /** @description Status operacional; começa em EVehicleStatus.Available. */
       status?: components['schemas']['EVehicleStatus']
-      /**
-       * Format: date-time
-       * @description Momento (UTC) da inativação; nulo enquanto o veículo está ativo.
-       */
+      /** Format: date-time */
       deactivatedAt?: null | string
       /** @description Veículo ativo: aparece nas seleções e entra no rateio de custo fixo. */
       isActive?: boolean
@@ -908,6 +1128,210 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ResponseOfVehicle']
+        }
+      }
+    }
+  }
+  'Customers: List': {
+    parameters: {
+      query?: {
+        search?: string
+        isActive?: boolean
+        pageNumber?: number
+        pageSize?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PagedResponseOfListOfCustomer']
+        }
+      }
+    }
+  }
+  'Customers: Create': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateCustomerRequest']
+      }
+    }
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfCustomer']
+        }
+      }
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/problem+json': components['schemas']['HttpValidationProblemDetails']
+        }
+      }
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfCustomer']
+        }
+      }
+    }
+  }
+  'Customers: Get': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfCustomer']
+        }
+      }
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfCustomer']
+        }
+      }
+    }
+  }
+  'Customers: Update': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateCustomerRequest']
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfCustomer']
+        }
+      }
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/problem+json': components['schemas']['HttpValidationProblemDetails']
+        }
+      }
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfCustomer']
+        }
+      }
+    }
+  }
+  'Customers: Deactivate': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfCustomer']
+        }
+      }
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfCustomer']
+        }
+      }
+    }
+  }
+  'Customers: Reactivate': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfCustomer']
+        }
+      }
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfCustomer']
         }
       }
     }

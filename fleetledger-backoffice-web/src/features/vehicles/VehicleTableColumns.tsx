@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router'
 import { vehicleDetailPath } from '@/app/routePaths'
-import { Badge } from '@/design-system/components/Badge'
+import { Badge, type BadgePresentation } from '@/design-system/components/Badge'
 import type { DataTableColumn } from '@/design-system/components/DataTable'
 import { formatQuantity } from '@/design-system/numberFormat'
 import { presentVehicleActivity, presentVehicleStatus, type Vehicle } from './vehicle'
@@ -44,6 +44,6 @@ function PlateLink({ vehicle }: { vehicle: Vehicle }): ReactNode {
   )
 }
 
-function PresentedBadge({ label, tone }: ReturnType<typeof presentVehicleStatus>): ReactNode {
+function PresentedBadge({ label, tone }: BadgePresentation): ReactNode {
   return <Badge tone={tone}>{label}</Badge>
 }

@@ -57,3 +57,32 @@ export function useMutationForm<TValues, TRequest, TValue>(
     isPending: options.mutation.isPending,
   }
 }
+
+export interface FieldBinding {
+  value: string
+  error: string | undefined
+  onChange: (event: { target: { value: string } }) => void
+}
+
+type TextFieldOf<TValues> = {
+  [TField in keyof TValues]: TValues[TField] extends string ? TField : never
+}[keyof TValues]
+
+/**
+ * Liga um campo de texto do formulário a um TextField: valor, erro do campo e troca.
+ * @example <TextField label="Placa" {...fieldBinding(form, 'plate')} />
+ */
+export function fieldBinding<TValues>(
+  form: MutationFormState<TValues>,
+  field: TextFieldOf<TValues>,
+): FieldBinding {
+  // `as`: TextFieldOf já restringe o campo aos de tipo string, mas o TypeScript não
+  // estreita um tipo indexado por genérico; as conversões só repetem essa garantia.
+  return {
+    value: form.values[field] as string,
+    error: form.fieldErrors[field as string],
+    onChange: (event) => {
+      form.setField(field, event.target.value as TValues[typeof field])
+    },
+  }
+}

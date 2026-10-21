@@ -1,7 +1,7 @@
 import type { components } from '@/api/generated/schema'
-import type { ListQuery } from '@/api/listQuery'
+import { presentActivity, type ListQuery } from '@/api/listQuery'
+import type { BadgePresentation } from '@/design-system/components/Badge'
 import type { SelectOption } from '@/design-system/components/SelectField'
-import type { BadgeTone } from '@/design-system/components/Badge'
 import { formatCurrency } from '@/design-system/numberFormat'
 
 export type Vehicle = components['schemas']['Vehicle']
@@ -9,11 +9,6 @@ export type VehicleStatus = components['schemas']['EVehicleStatus']
 export type VehiclePage = components['schemas']['PagedResponseOfListOfVehicle']
 export type CreateVehicleRequest = components['schemas']['CreateVehicleRequest']
 export type UpdateVehicleRequest = components['schemas']['UpdateVehicleRequest']
-
-export interface BadgePresentation {
-  label: string
-  tone: BadgeTone
-}
 
 const STATUS_PRESENTATION: Record<VehicleStatus, BadgePresentation> = {
   Available: { label: 'Disponível', tone: 'success' },
@@ -39,9 +34,6 @@ export function isVehicleStatusFilter(value: string): value is VehicleStatusFilt
   return VEHICLE_STATUS_FILTER_OPTIONS.some((option) => option.value === value)
 }
 
-const ACTIVE: BadgePresentation = { label: 'Ativo', tone: 'success' }
-const INACTIVE: BadgePresentation = { label: 'Inativo', tone: 'neutral' }
-
 /**
  * Badge do status operacional (card Badge: verde disponível, azul em viagem, âmbar em manutenção).
  * @example presentVehicleStatus('InMaintenance') // { label: 'Em manutenção', tone: 'warning' }
@@ -51,7 +43,7 @@ export function presentVehicleStatus(status: VehicleStatus | undefined): BadgePr
 }
 
 export function presentVehicleActivity(vehicle: Vehicle): BadgePresentation {
-  return vehicle.isActive === false ? INACTIVE : ACTIVE
+  return presentActivity(vehicle.isActive)
 }
 
 /**

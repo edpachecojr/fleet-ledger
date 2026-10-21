@@ -1,4 +1,4 @@
-import { isActivityFilter, listQueryParams } from './listQuery'
+import { isActivityFilter, listQueryParams, presentActivity } from './listQuery'
 
 describe('listQueryParams', () => {
   it('sends only active records by default and trims the search', () => {
@@ -26,5 +26,12 @@ describe('isActivityFilter', () => {
   it('accepts the known filters only', () => {
     expect(isActivityFilter('inactive')).toBe(true)
     expect(isActivityFilter('deleted')).toBe(false)
+  })
+})
+
+describe('presentActivity', () => {
+  it('tells active and inactive records apart', () => {
+    expect(presentActivity(true)).toEqual({ label: 'Ativo', tone: 'success' })
+    expect(presentActivity(false)).toEqual({ label: 'Inativo', tone: 'neutral' })
   })
 })

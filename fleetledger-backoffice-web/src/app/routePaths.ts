@@ -5,6 +5,9 @@ export const RoutePath = {
   vehicles: '/veiculos',
   newVehicle: '/veiculos/novo',
   vehicleDetail: '/veiculos/:vehicleId',
+  customers: '/clientes',
+  newCustomer: '/clientes/novo',
+  customerDetail: '/clientes/:customerId',
 } as const
 
 /**
@@ -13,4 +16,9 @@ export const RoutePath = {
  */
 export function vehicleDetailPath(vehicleId: string): string {
   return `${RoutePath.vehicles}/${vehicleId}`
+}
+
+/** Rota do detalhe de um cliente. */
+export function customerDetailPath(customerId: string): string {
+  return `${RoutePath.customers}/${customerId}`
 }

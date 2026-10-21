@@ -109,6 +109,80 @@ namespace FleetLedger.Api.Data.Migrations
                     b.ToTable("users", (string)null);
                 });
 
+            modelBuilder.Entity("FleetLedger.Core.Models.Customer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<int>("BillingCycle")
+                        .HasColumnType("integer")
+                        .HasColumnName("billing_cycle");
+
+                    b.Property<string>("Cnpj")
+                        .IsRequired()
+                        .HasMaxLength(14)
+                        .HasColumnType("character(14)")
+                        .HasColumnName("cnpj")
+                        .IsFixedLength();
+
+                    b.Property<string>("CorporateName")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("character varying(160)")
+                        .HasColumnName("corporate_name");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasPrecision(6)
+                        .HasColumnType("timestamp(6) with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTimeOffset?>("DeactivatedAt")
+                        .HasPrecision(6)
+                        .HasColumnType("timestamp(6) with time zone")
+                        .HasColumnName("deactivated_at");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(254)
+                        .HasColumnType("character varying(254)")
+                        .HasColumnName("email");
+
+                    b.Property<Guid>("OrganizationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("organization_id");
+
+                    b.Property<int?>("PaymentTermDays")
+                        .HasColumnType("integer")
+                        .HasColumnName("payment_term_days");
+
+                    b.Property<string>("Phone")
+                        .HasMaxLength(11)
+                        .HasColumnType("character varying(11)")
+                        .HasColumnName("phone");
+
+                    b.Property<string>("TradeName")
+                        .HasMaxLength(160)
+                        .HasColumnType("character varying(160)")
+                        .HasColumnName("trade_name");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasPrecision(6)
+                        .HasColumnType("timestamp(6) with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_customers");
+
+                    b.HasIndex("OrganizationId")
+                        .HasDatabaseName("ix_customers_organization_id");
+
+                    b.HasIndex("OrganizationId", "Cnpj")
+                        .IsUnique()
+                        .HasDatabaseName("ix_customers_organization_id_cnpj");
+
+                    b.ToTable("customers", (string)null);
+                });
+
             modelBuilder.Entity("FleetLedger.Core.Models.LedgerAccount", b =>
                 {
                     b.Property<Guid>("Id")
@@ -624,6 +698,16 @@ namespace FleetLedger.Api.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_users_organizations_organization_id");
+                });
+
+            modelBuilder.Entity("FleetLedger.Core.Models.Customer", b =>
+                {
+                    b.HasOne("FleetLedger.Core.Models.Organization", null)
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_customers_organizations_organization_id");
                 });
 
             modelBuilder.Entity("FleetLedger.Core.Models.LedgerAccount", b =>

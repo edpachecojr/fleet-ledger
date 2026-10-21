@@ -1,6 +1,8 @@
+using FleetLedger.Api.Data.Stores.Customers;
 using FleetLedger.Api.Data.Stores.LedgerAccounts;
 using FleetLedger.Api.Data.Stores.Vehicles;
 using FleetLedger.Api.Handlers.Auth;
+using FleetLedger.Api.Handlers.Customers;
 using FleetLedger.Api.Handlers.LedgerAccounts;
 using FleetLedger.Api.Handlers.Vehicles;
 using FleetLedger.Core.Handlers;
@@ -21,5 +23,8 @@ public static class ApplicationServicesExtension
 
         builder.Services.AddScoped<IVehicleStore, VehicleStore>();
         builder.Services.AddScoped<IVehicleHandler, VehicleHandler>();
+
+        builder.Services.AddScoped<ICustomerStore, CustomerStore>();
+        builder.Services.AddScoped<ICustomerHandler, CustomerHandler>();
     }
 }

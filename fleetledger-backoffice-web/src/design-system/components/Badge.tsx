@@ -11,6 +11,12 @@ const TONE_CLASSES: Record<BadgeTone, string> = {
   neutral: 'bg-neutral-soft text-text-secondary',
 }
 
+/** Rótulo e tom de um status para o Badge, calculados no mapeamento da feature. */
+export interface BadgePresentation {
+  label: string
+  tone: BadgeTone
+}
+
 interface BadgeProps {
   tone: BadgeTone
   children: ReactNode

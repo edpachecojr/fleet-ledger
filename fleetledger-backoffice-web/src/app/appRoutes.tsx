@@ -1,5 +1,8 @@
 import type { RouteObject } from 'react-router'
 import { ChartOfAccountsPage } from '@/features/chart-of-accounts/ChartOfAccountsPage'
+import { CustomerDetailPage } from '@/features/customers/CustomerDetailPage'
+import { CustomersPage } from '@/features/customers/CustomersPage'
+import { NewCustomerPage } from '@/features/customers/NewCustomerPage'
 import { LoginPage } from '@/features/login/LoginPage'
 import { NewVehiclePage } from '@/features/vehicles/NewVehiclePage'
 import { VehicleDetailPage } from '@/features/vehicles/VehicleDetailPage'
@@ -26,6 +29,9 @@ export const APP_ROUTES: RouteObject[] = [
       { path: RoutePath.vehicles, element: <VehiclesPage /> },
       { path: RoutePath.newVehicle, element: <NewVehiclePage /> },
       { path: RoutePath.vehicleDetail, element: <VehicleDetailPage /> },
+      { path: RoutePath.customers, element: <CustomersPage /> },
+      { path: RoutePath.newCustomer, element: <NewCustomerPage /> },
+      { path: RoutePath.customerDetail, element: <CustomerDetailPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },
