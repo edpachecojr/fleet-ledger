@@ -17,7 +17,7 @@ Manter o cadastro de motoristas com comissão padrão e controle de vencimento d
 - Documento vencido gera apenas **aviso** na abertura de viagem, sem bloqueio (*Q1*).
 
 ## Critérios de aceite
-- [ ] É possível cadastrar, editar e listar motoristas.
-- [ ] CPF inválido/duplicado ou comissão fora da faixa é rejeitada.
-- [ ] A listagem exibe corretamente a situação documental conforme as datas.
-- [ ] É possível filtrar motoristas com documentos vencidos ou vencendo.
+- [x] É possível cadastrar, editar e listar motoristas.
+- [x] CPF inválido/duplicado ou comissão fora da faixa é rejeitada.
+- [x] A listagem exibe corretamente a situação documental conforme as datas.
+- [x] É possível filtrar motoristas com documentos vencidos ou vencendo.
