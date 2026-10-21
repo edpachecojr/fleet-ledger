@@ -12,6 +12,7 @@ public static class HttpContractExtension
     {
         builder.Services.AddOpenApi();
         builder.Services.Configure<JsonOptions>(ConfigureJson);
+        builder.Services.Configure<ExceptionHandlerOptions>(options => options.StatusCodeSelector = SelectStatusCode);
         builder.Services.AddProblemDetails(options =>
             options.CustomizeProblemDetails = context =>
                 context.ProblemDetails.Extensions[TraceIdExtension] =
@@ -25,6 +26,13 @@ public static class HttpContractExtension
         options.SerializerOptions.NumberHandling = JsonNumberHandling.Strict;
         options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
     }
+
+    // Parâmetro ausente ou inválido na rota/query (ex.: enum desconhecido) chega como
+    // BadHttpRequestException; sem isto o UseExceptionHandler responde 500 a erro do cliente.
+    public static int SelectStatusCode(Exception exception)
+        => exception is BadHttpRequestException badRequest
+            ? badRequest.StatusCode
+            : StatusCodes.Status500InternalServerError;
 
     // O documento OpenAPI é o contrato com qualquer cliente: publicado em todo ambiente.
     public static void MapHttpContract(this WebApplication app)
