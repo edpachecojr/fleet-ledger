@@ -16,9 +16,9 @@ Restringir todo o backoffice a um único usuário Administrador (gestor da frota
 - Senha armazenada de forma segura (nunca em texto puro).
 
 ## Critérios de aceite
-- [ ] Com credenciais válidas o administrador acessa o backoffice.
-- [ ] Credenciais inválidas exibem mensagem genérica e não autenticam.
-- [ ] Qualquer chamada à API sem autenticação é rejeitada.
-- [ ] Acessar uma tela sem sessão redireciona para o login.
-- [ ] Logout encerra a sessão e impede novo acesso sem login.
-- [ ] Sessão expirada exige novo login.
+- [x] Com credenciais válidas o administrador acessa o backoffice.
+- [x] Credenciais inválidas exibem mensagem genérica e não autenticam.
+- [x] Qualquer chamada à API sem autenticação é rejeitada.
+- [x] Acessar uma tela sem sessão redireciona para o login.
+- [x] Logout encerra a sessão e impede novo acesso sem login.
+- [x] Sessão expirada exige novo login.

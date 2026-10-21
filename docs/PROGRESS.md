@@ -8,21 +8,21 @@ Arquivo vivo: atualize ao iniciar, concluir ou bloquear uma tarefa, e ao tomar d
 
 | Marco | Tarefas | Concluídas | Status |
 |-------|---------|-----------:|--------|
-| M0 — Fundação | 001–002 | 1/2 | 🟨 |
+| M0 — Fundação | 001–002 | 2/2 | ✅ |
 | M1 — Cadastros | 003–007 | 0/5 | ⬜ |
 | M2 — Financeiro base | 008–010 | 0/3 | ⬜ |
 | M3 — Viagens | 011–018 | 0/8 | ⬜ |
 | M4 — Faturamento | 019–024 | 0/6 | ⬜ |
 | M5 — Manutenção | 025–027 | 0/3 | ⬜ |
 | M6 — Resultados | 028–032 | 0/5 | ⬜ |
-| **Total** | | **1/32** | |
+| **Total** | | **2/32** | |
 
 ## Tarefas
 
 | ID | Tarefa | Status | Início | Conclusão | Observações |
 |----|--------|--------|--------|-----------|-------------|
 | TASK-001 | Estrutura base da aplicação executável | ✅ | 2026-10-20 | 2026-10-20 | API (`fleetledger-api/`) + backoffice (`fleetledger-backoffice-web/`) + banco com `docker compose up --build`. CI ainda não configurado. |
-| TASK-002 | Login do administrador e proteção de acesso | ⬜ | | | |
+| TASK-002 | Login do administrador e proteção de acesso | ✅ | 2026-10-20 | 2026-10-20 | `POST /v1/auth/login` (JWT 8 h, bloqueio 15 min após 5 erros), seed do administrador, tela de login, rotas protegidas, logout e expiração no backoffice. ADR 0007. |
 | TASK-003 | Plano de Contas padrão | ⬜ | | | |
 | TASK-004 | Cadastro de veículos | ⬜ | | | |
 | TASK-005 | Status operacional do veículo e bloqueio de alocação | ⬜ | | | |
@@ -75,6 +75,11 @@ Registre aqui as respostas às questões em aberto do [backlog](backlog/README.m
 | 2026-10-20 | ADR 0003 | Isolamento lógico por organização: `IOrganizationOwned` + `ForOrganization` explícito; organização só via `IUserContext`. | todas |
 | 2026-10-20 | ADR 0004 | Testes: só unitários com fakes, sem banco; integração ponta a ponta fica para depois. | todas |
 | 2026-10-20 | ADR 0005 | Contrato HTTP: Minimal API + OpenAPI (Scalar em dev); front-end fora de `fleetledger-api`. | todas |
+| 2026-10-20 | TASK-002 | Access token JWT de **8 h sem refresh token**; expirou, novo login. Logout só no cliente (descarta o token). | 002 |
+| 2026-10-20 | TASK-002 | Login por **e-mail** + senha; **bloqueio de 15 min após 5 tentativas** erradas (lockout do Identity), sem revelar o bloqueio na mensagem. | 002 |
+| 2026-10-20 | TASK-002 | Administrador e organização inicial criados na subida da API a partir da seção `Seed` da configuração (`.env` no compose); idempotente. | 002 |
+| 2026-10-20 | TASK-002 | Backoffice guarda o token em **`sessionStorage`** (sobrevive ao F5, some ao fechar a aba). | 002 |
+| 2026-10-20 | ADR 0007 | Sessão do administrador: JWT 8 h sem refresh, logout no cliente, lockout do Identity, seed por configuração, token em `sessionStorage`. | 002 |
 | 2026-10-20 | ADR 0006 | Front-end: SPA React 19 + Vite, React Router, TanStack Query, cliente gerado do OpenAPI, design system Backoffice com Tailwind 4; nginx faz proxy de `/api`. | todas |
 
 ## Diário
@@ -91,3 +96,7 @@ Registro cronológico do que foi feito, problemas e próximos passos.
 - **Próximo passo:** front-end da TASK-001 (shell do backoffice) e incluí-lo no compose; depois TASK-002 (emissão do JWT, seed do administrador e da organização).
 - TASK-001 concluída — front-end: `fleetledger-backoffice-web/` (React 19.3, Vite 8, TypeScript 6, Tailwind 4, React Router 8, TanStack Query 5, pnpm). Shell do design system Backoffice (sidebar, header, painel de aparência com modo/cor/densidade/direção, temas claro e escuro), página "Visão geral" com card de status do sistema lendo `GET /health` pelo cliente gerado do OpenAPI. 30 testes Vitest verdes; `docker compose up --build` sobe banco + API + backoffice (http://localhost:3000). Na API, `/health` virou endpoint Minimal API documentado no OpenAPI (status como enum texto, números estritos).
 - **Próximo passo:** TASK-002 — emissão do JWT, seed do administrador e da organização, tela de login e `AccessTokenSource` da sessão no backoffice.
+- TASK-002 iniciada e concluída. API: `POST /v1/auth/login` (anônima, `ValidationFilter`), `AccessTokenIssuer` (JWT só com `sub` e `jti`, vida em `Jwt:AccessTokenLifetimeMinutes`), `IdentityCredentialVerifier` com lockout (5 erros → 15 min) e 401 genérico para qualquer recusa, `AdministratorSeeder` idempotente lendo `AdministratorSeed:*` (compose: `ADMIN_*` no `.env`). Backoffice: `AdminSession` (sessionStorage) como `AccessTokenSource`, `RequireSession` protegendo todas as rotas menos `/login`, tela de login com `TextField` do design system, botão "Sair" no header, fim da sessão no `expiresAt` e em 401 de requisição autenticada, cache do TanStack Query limpo ao sair. `dotnet test`: 116 testes; `pnpm test`: 69 testes. Validado ponta a ponta no compose (login certo/errado, token válido/adulterado, seed não repete).
+- CA1873 desligada junto com a CA1848 no `.editorconfig` da API (mesma decisão: logs com message template, sem `LoggerMessage`).
+- Observação: o login com e-mail inexistente responde mais rápido que com senha errada (não calcula hash). Com um único administrador o risco de enumeração é baixo; revisitar se houver cadastro de usuários.
+- **Marco M0 concluído.** **Próximo passo:** M1 — TASK-003 (Plano de Contas padrão).

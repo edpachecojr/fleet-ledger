@@ -101,14 +101,17 @@ Cada escolha tem motivo e alternativas registrados em [`docs/adr/`](docs/adr/).
 ```bash
 git clone https://github.com/edpachecojr/fleet-ledger.git
 cd fleet-ledger
-cp .env.example .env      # troque a senha e gere uma JWT_SIGNING_KEY (openssl rand -base64 48)
+cp .env.example .env      # troque as senhas e gere uma JWT_SIGNING_KEY (openssl rand -base64 48)
 docker compose up --build
 ```
+
+Entre no backoffice com `ADMIN_EMAIL` e `ADMIN_PASSWORD` do `.env`. O administrador e a organização são criados na primeira subida com o banco vazio. Depois disso, mudar essas variáveis não altera o usuário existente.
 
 | Serviço | Endereço |
 | --- | --- |
 | Backoffice | http://localhost:3000 |
 | API: saúde (inclui o banco) | http://localhost:5080/health |
+| API: login | `POST http://localhost:5080/v1/auth/login` |
 | API: documento OpenAPI | http://localhost:5080/openapi/v1.json |
 | API: referência interativa (Scalar) | http://localhost:5080/scalar |
 | PostgreSQL | `localhost:5433` (usuário e banco `fleetledger`) |
@@ -127,6 +130,9 @@ Com o banco no ar (`docker compose up -d postgres`), configure os segredos locai
 cd fleetledger-api
 dotnet user-secrets --project src/FleetLedger.Api set "Database:ConnectionString" "Host=localhost;Port=5433;Database=fleetledger;Username=fleetledger;Password=<POSTGRES_PASSWORD do .env>"
 dotnet user-secrets --project src/FleetLedger.Api set "Jwt:SigningKey" "<chave com 32 bytes ou mais>"
+dotnet user-secrets --project src/FleetLedger.Api set "AdministratorSeed:OrganizationName" "Transportes Exemplo"
+dotnet user-secrets --project src/FleetLedger.Api set "AdministratorSeed:Email" "admin@fleetledger.local"
+dotnet user-secrets --project src/FleetLedger.Api set "AdministratorSeed:Password" "<12+ caracteres: maiúscula, minúscula, dígito e símbolo>"
 dotnet run --project src/FleetLedger.Api        # http://localhost:5080
 ```
 
@@ -173,6 +179,7 @@ Warnings de compilação são erros nos dois projetos. O ESLint do backoffice ta
 | --- | --- |
 | `POSTGRES_PASSWORD` | senha do banco local |
 | `JWT_SIGNING_KEY` | chave HS256 do access token, mínimo de 32 bytes |
+| `ADMIN_ORGANIZATION_NAME` / `ADMIN_EMAIL` / `ADMIN_PASSWORD` | administrador único e sua organização, criados na primeira subida |
 | `POSTGRES_PORT` / `API_PORT` / `WEB_PORT` | portas no host (padrão 5433 / 5080 / 3000) |
 
 **API (`appsettings.json`, user-secrets ou variáveis de ambiente com `__`):**
@@ -181,7 +188,9 @@ Warnings de compilação são erros nos dois projetos. O ESLint do backoffice ta
 | --- | --- |
 | `Database:ConnectionString` | conexão PostgreSQL (segredo) |
 | `Database:ApplyMigrationsOnStartup` | aplica migrations na subida (`true` em Development) |
-| `Jwt:Issuer` / `Jwt:Audience` / `Jwt:SigningKey` | validação do access token |
+| `Jwt:Issuer` / `Jwt:Audience` / `Jwt:SigningKey` | emissão e validação do access token |
+| `Jwt:AccessTokenLifetimeMinutes` | duração da sessão, padrão 480 (8 h); sem refresh token |
+| `AdministratorSeed:OrganizationName` / `:Email` / `:Password` | administrador inicial (senha é segredo); ignorado se já houver usuário |
 | `Cors:AllowedOrigins` | origens de navegador permitidas (vazio: não há chamada cross-origin) |
 | `Otlp:Endpoint` | coletor OpenTelemetry; vazio desliga a exportação |
 
@@ -197,7 +206,8 @@ Configuração inválida derruba a API na subida com mensagem que diz a chave e 
   [0003 Isolamento por organização](docs/adr/0003-isolamento-por-organizacao.md) ·
   [0004 Testes](docs/adr/0004-testes-unitarios-sem-banco.md) ·
   [0005 Contrato HTTP](docs/adr/0005-contrato-http-minimal-api-openapi.md) ·
-  [0006 Front-end](docs/adr/0006-frontend-backoffice-vite-spa.md)
+  [0006 Front-end](docs/adr/0006-frontend-backoffice-vite-spa.md) ·
+  [0007 Sessão do administrador](docs/adr/0007-sessao-do-administrador.md)
 
 ## Convenções
 
