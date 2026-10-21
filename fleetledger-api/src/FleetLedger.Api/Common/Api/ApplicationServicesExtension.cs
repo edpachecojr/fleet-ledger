@@ -1,3 +1,6 @@
+using FleetLedger.Api.Handlers.Auth;
+using FleetLedger.Core.Handlers;
+
 namespace FleetLedger.Api.Common.Api;
 
 public static class ApplicationServicesExtension
@@ -6,5 +9,7 @@ public static class ApplicationServicesExtension
     {
         builder.Services.AddSingleton(TimeProvider.System);
         builder.Services.AddHybridCache();
+
+        builder.Services.AddScoped<IAuthHandler, AuthHandler>();
     }
 }

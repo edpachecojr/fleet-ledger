@@ -20,6 +20,13 @@ public sealed class JwtOptionsValidator : IValidateOptions<JwtOptions>
                 $"{Section}:SigningKey",
                 $"{Section}:SigningKey deve ter ao menos {JwtOptions.MinimumSigningKeyBytes} bytes. " +
                 $"Recebido: {signingKeyBytes} bytes.")
+            .Range(
+                $"{Section}:AccessTokenLifetimeMinutes",
+                options.AccessTokenLifetimeMinutes,
+                JwtOptions.MinimumAccessTokenLifetimeMinutes,
+                JwtOptions.MaximumAccessTokenLifetimeMinutes,
+                $"{Section}:AccessTokenLifetimeMinutes deve estar entre {JwtOptions.MinimumAccessTokenLifetimeMinutes} " +
+                $"e {JwtOptions.MaximumAccessTokenLifetimeMinutes}. Recebido: {options.AccessTokenLifetimeMinutes}.")
             .Build()
             .ToOptionsResult();
     }

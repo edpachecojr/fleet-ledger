@@ -22,8 +22,8 @@ Models/              BaseModel, IOrganizationOwned, Organization, entidades
 Requests/            Request, PagedRequest, <Modulo>/
 Responses/           Response<T>, PagedResponse<T>
 Security/            IUserContext
-Handlers/            SOMENTE interfaces I<Modulo>Handler (criada no primeiro módulo)
-Validators/<Modulo>/ um validador por Request (criada no primeiro módulo)
+Handlers/            SOMENTE interfaces I<Modulo>Handler
+Validators/<Modulo>/ um validador por Request
 ```
 
 ## Regras
@@ -31,6 +31,7 @@ Validators/<Modulo>/ um validador por Request (criada no primeiro módulo)
 - Entidade é POCO: sem atributo de persistência; mapeamento em `Api/Data/Mappings/`.
 - Entidade herda `BaseModel`; se pertence a uma organização, implementa `IOrganizationOwned`.
 - Request herda `Request` (ou `PagedRequest`) e não tem atributo de validação.
+  Exceção: `LoginRequest`, anônima, não tem organização a atribuir.
 - `Response<T>.Code` é público e serializado (antipadrão A-02, travado por teste).
 - Enum com prefixo `E` e valor explícito (`Active = 1`): o número é persistido.
 - Todo membro público tem XML doc com intenção e, quando não for óbvio, exemplo

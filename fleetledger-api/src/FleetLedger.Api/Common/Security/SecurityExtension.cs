@@ -11,7 +11,7 @@ public static class SecurityExtension
     public static void AddSecurity(this WebApplicationBuilder builder)
     {
         builder.Services
-            .AddIdentityCore<User>()
+            .AddIdentityCore<User>(AdministratorIdentityPolicy.Apply)
             .AddEntityFrameworkStores<AppDbContext>();
 
         builder.Services
@@ -20,13 +20,15 @@ public static class SecurityExtension
         builder.Services.ConfigureOptions<JwtBearerOptionsSetup>();
 
         // Fechado por padrão: rota nova exige autenticação sem ninguém lembrar de pedir.
-        // Exceções explícitas usam AllowAnonymous (health, documento OpenAPI).
+        // Exceções explícitas usam AllowAnonymous (health, login, documento OpenAPI).
         builder.Services
             .AddAuthorizationBuilder()
             .SetFallbackPolicy(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build());
 
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddScoped<IUserContext, UserContext>();
+        builder.Services.AddScoped<ICredentialVerifier, IdentityCredentialVerifier>();
+        builder.Services.AddSingleton<IAccessTokenIssuer, AccessTokenIssuer>();
     }
 
     public static void UseSecurity(this WebApplication app)

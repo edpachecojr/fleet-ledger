@@ -18,7 +18,7 @@ Manutenção, Resultados (DRE).
 | Plataforma | .NET 10 · C# latest | — |
 | API | ASP.NET Core Minimal API (`IEndpoint`), sem controllers | `docs/adr/0005` |
 | Persistência | EF Core + PostgreSQL, `snake_case` | `docs/adr/0001` |
-| Autenticação | ASP.NET Core Identity + JWT bearer | `docs/adr/0002` |
+| Autenticação | ASP.NET Core Identity + JWT bearer (8 h, sem refresh) | `docs/adr/0002`, `0007` |
 | Isolamento | por organização, explícito na aplicação | `docs/adr/0003` |
 | Documentação da API | OpenAPI nativo + Scalar (dev) | `docs/adr/0005` |
 | Cache | `HybridCache` (em memória) | `docs/adr/0003` |

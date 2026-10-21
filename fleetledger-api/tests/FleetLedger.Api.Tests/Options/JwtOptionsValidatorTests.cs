@@ -30,9 +30,23 @@ public class JwtOptionsValidatorTests
         result.FailureMessage.Should().NotContain("short-secret");
     }
 
+    [Theory]
+    [InlineData(4)]
+    [InlineData(1441)]
+    public void Validate_WhenAccessTokenLifetimeIsOutOfRange_FailsWithReceivedValue(int minutes)
+        => _validator.Validate(null, ValidOptions(accessTokenLifetimeMinutes: minutes))
+            .FailureMessage.Should().Contain("Jwt:AccessTokenLifetimeMinutes").And.Contain($"Recebido: {minutes}");
+
     private static JwtOptions ValidOptions(
         string issuer = "fleetledger-api",
         string audience = "fleetledger-clients",
-        string signingKey = ValidSigningKey)
-        => new() { Issuer = issuer, Audience = audience, SigningKey = signingKey };
+        string signingKey = ValidSigningKey,
+        int accessTokenLifetimeMinutes = JwtOptions.DefaultAccessTokenLifetimeMinutes)
+        => new()
+        {
+            Issuer = issuer,
+            Audience = audience,
+            SigningKey = signingKey,
+            AccessTokenLifetimeMinutes = accessTokenLifetimeMinutes
+        };
 }

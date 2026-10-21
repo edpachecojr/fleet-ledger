@@ -3,6 +3,7 @@ using FleetLedger.Api.Common.Health;
 using FleetLedger.Api.Common.Observability;
 using FleetLedger.Api.Common.Security;
 using FleetLedger.Api.Data;
+using FleetLedger.Api.Data.Seed;
 using FleetLedger.Api.Endpoints;
 using FleetLedger.Api.Options;
 
@@ -13,6 +14,7 @@ builder.AddApplicationOptions();
 builder.AddValidators();
 builder.AddSecurity();
 builder.AddDataContexts();
+builder.AddAdministratorSeed();
 builder.AddHealthMonitoring();
 builder.AddCrossOrigin();
 builder.AddHttpContract();
@@ -30,6 +32,7 @@ if (app.Environment.IsDevelopment())
     app.ConfigureDevEnvironment();
 
 await app.ApplyPendingMigrationsAsync();
+await app.SeedAdministratorAsync();
 await app.RunAsync();
 
 public partial class Program;

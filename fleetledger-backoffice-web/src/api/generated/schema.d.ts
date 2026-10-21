@@ -24,6 +24,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/auth/login': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Autentica o administrador e emite o access token
+     * @description Responde 401 com mensagem genérica para qualquer credencial recusada.
+     */
+    post: operations['Auth: Login']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
 export type webhooks = Record<string, never>
 export interface components {
@@ -43,6 +63,57 @@ export interface components {
     }
     /** @enum {unknown} */
     HealthStatus: 'Unhealthy' | 'Degraded' | 'Healthy'
+    HttpValidationProblemDetails: {
+      type?: null | string
+      title?: null | string
+      /** Format: int32 */
+      status?: null | number
+      detail?: null | string
+      instance?: null | string
+      errors?: {
+        [key: string]: string[]
+      }
+    }
+    /**
+     * @description Access token (JWT) emitido no login. Não há refresh token: ao expirar, o cliente pede novo login.
+     * @example ```new IssuedAccessToken("eyJhbGciOi...", now.AddHours(8))```
+     */
+    IssuedAccessToken: {
+      /** @description JWT a enviar no header `Authorization: Bearer`. */
+      accessToken: string
+      /**
+       * Format: date-time
+       * @description Momento (UTC) a partir do qual a API recusa o token.
+       */
+      expiresAt: string
+    }
+    /**
+     * @description Credenciais do administrador para obter um access token. Não herda Request:
+     *     é a única requisição anônima, e ainda não existe organização a atribuir.
+     * @example ```new LoginRequest { Email = "gestor@empresa.com.br", Password = "..." }```
+     */
+    LoginRequest: {
+      /** @description E-mail cadastrado do administrador. */
+      email?: string
+      /** @description Senha em texto, só em trânsito (HTTPS); nunca é registrada em log. */
+      password?: string
+    }
+    /**
+     * @description Envelope único de retorno das operações. int Response&lt;TData&gt;.Code é o status HTTP calculado
+     *     pelo handler e devolvido tal qual pelo endpoint.
+     * @example ```return new Response&lt;Vehicle?&gt;(null, 404, "Veículo não encontrado");```
+     */
+    ResponseOfIssuedAccessToken: {
+      data?: null | components['schemas']['IssuedAccessToken']
+      /** @description Mensagem para o usuário. Como exibi-la é decisão do cliente. */
+      message?: null | string
+      /**
+       * Format: int32
+       * @description Status HTTP da operação. Precisa ser público e serializado: o cliente depende dele
+       *     e, sem ele, bool Response&lt;TData&gt;.IsSuccess mente depois da desserialização (antipadrão A-02).
+       */
+      code?: number
+    }
   }
   responses: never
   parameters: never
@@ -77,6 +148,48 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['HealthCheckResponse']
+        }
+      }
+    }
+  }
+  'Auth: Login': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['LoginRequest']
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfIssuedAccessToken']
+        }
+      }
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/problem+json': components['schemas']['HttpValidationProblemDetails']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfIssuedAccessToken']
         }
       }
     }

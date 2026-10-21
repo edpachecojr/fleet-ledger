@@ -1,4 +1,5 @@
 using FleetLedger.Api.Common.Api;
+using FleetLedger.Api.Endpoints.Auth;
 using FleetLedger.Api.Endpoints.Health;
 
 namespace FleetLedger.Api.Endpoints;
@@ -9,6 +10,7 @@ public static class EndpointMapper
     public static void MapEndpoints(this WebApplication app)
     {
         app.MapEndpoint<GetHealthEndpoint>();
+        app.MapAuthEndpoints();
         app.MapHttpContract();
     }
 }

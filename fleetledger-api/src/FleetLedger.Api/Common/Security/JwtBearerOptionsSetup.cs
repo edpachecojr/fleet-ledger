@@ -1,4 +1,3 @@
-using System.Text;
 using FleetLedger.Api.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
@@ -29,7 +28,7 @@ public sealed class JwtBearerOptionsSetup(IOptions<JwtOptions> jwtOptions) : ICo
             ValidateAudience = true,
             ValidAudience = jwt.Audience,
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.SigningKey)),
+            IssuerSigningKey = JwtSigningKey.From(jwt),
             ValidateLifetime = true,
             ClockSkew = AllowedClockSkew
         };

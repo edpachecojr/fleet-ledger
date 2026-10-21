@@ -134,5 +134,7 @@ dotnet_diagnostic.CS1591.severity = none
 
 # Logs usam as extensões LogInformation/LogError com message template.
 # LoggerMessage gerado só se justifica em caminho quente medido.
+# CA1873 (guarda IsEnabled antes de logar) é o mesmo custo/benefício: desligada junto.
 [src/**/*.cs]
 dotnet_diagnostic.CA1848.severity = none
+dotnet_diagnostic.CA1873.severity = none

@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import { useLocation } from 'react-router'
 import { PRODUCT_NAME } from '@/app/product'
 import { IconButton } from '@/design-system/components/IconButton'
+import { LogoutButton } from './LogoutButton'
 import { findNavigationItem } from './navigation'
 import { ThemeModeToggle } from './ThemeModeToggle'
 
@@ -23,6 +24,7 @@ export function Header({ onOpenNavigation }: HeaderProps): ReactNode {
       <span className="text-sm font-medium">{title}</span>
       <span className="flex-1" />
       <ThemeModeToggle />
+      <LogoutButton />
     </header>
   )
 }

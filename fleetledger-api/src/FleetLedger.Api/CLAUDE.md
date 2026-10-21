@@ -10,11 +10,13 @@ Common/Api/                IEndpoint, MapEndpoint, ValidationFilter, AddValidato
                            CORS, contrato HTTP (OpenAPI, JSON, ProblemDetails)
 Common/Health/             health checks registrados e contrato da resposta
 Common/Observability/      Serilog + OpenTelemetry
-Common/Security/           Identity, JWT, GetUserId, UserContext
+Common/Security/           Identity (política de bloqueio), JWT (validação e emissão),
+                           verificação de credenciais, GetUserId, UserContext
 Data/                      AppDbContext, convenções de modelo, ForOrganization,
-                           Mappings/, Migrations/ (geradas — não editar à mão)
+                           Mappings/, Migrations/ (geradas — não editar à mão),
+                           Seed/ (administrador e organização iniciais)
 Endpoints/                 EndpointMapper + <Modulo>/ (um arquivo por rota; Health/ é o molde)
-Handlers/<Modulo>/         regra de negócio (criada no primeiro módulo)
+Handlers/<Modulo>/         regra de negócio (Auth/ é o primeiro)
 Models/                    SOMENTE entidades acopladas à infra (User : IdentityUser)
 Options/                   Options + validador de cada seção de configuração
 ```

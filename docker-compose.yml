@@ -27,6 +27,9 @@ services:
       Database__ConnectionString: Host=postgres;Port=5432;Database=fleetledger;Username=fleetledger;Password=${POSTGRES_PASSWORD}
       Database__ApplyMigrationsOnStartup: "true"
       Jwt__SigningKey: ${JWT_SIGNING_KEY:?defina JWT_SIGNING_KEY no .env (veja .env.example)}
+      AdministratorSeed__OrganizationName: ${ADMIN_ORGANIZATION_NAME:?defina ADMIN_ORGANIZATION_NAME no .env (veja .env.example)}
+      AdministratorSeed__Email: ${ADMIN_EMAIL:?defina ADMIN_EMAIL no .env (veja .env.example)}
+      AdministratorSeed__Password: ${ADMIN_PASSWORD:?defina ADMIN_PASSWORD no .env (veja .env.example)}
     ports:
       - "${API_PORT:-5080}:8080"
 

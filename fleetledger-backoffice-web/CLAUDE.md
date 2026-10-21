@@ -50,7 +50,8 @@ src/
 │   ├── settings/            painel de aparência (modo, cor, densidade, direção)
 │   ├── styles/tokens.css    valores do design system Backoffice
 │   └── theme/               store, applyTheme
-├── layout/                  AppShell, Sidebar, Header, navigation.ts
+├── layout/                  AppShell, Sidebar, Header, LogoutButton, navigation.ts
+├── session/                 AdminSession, SessionProvider, RequireSession (proteção de rotas)
 ├── features/<funcionalidade>/   páginas, hooks, chamadas e componentes do domínio
 └── test/                    setup, renderApp, fakes/
 ```
@@ -136,8 +137,10 @@ SPA Vite, com os mesmos tokens e as mesmas receitas Tailwind.
   encaminha para `API_UPSTREAM`. Por isso a API não precisa de CORS.
 - Mudou a API? Suba a API e rode `pnpm api:types`; o TypeScript aponta cada uso
   que quebrou. O arquivo gerado é versionado.
-- Autenticação: o `ApiClient` envia `Authorization: Bearer` com o token de um
-  `AccessTokenSource`. Hoje é anônimo; a sessão do administrador chega na TASK-002.
+- Autenticação (`docs/adr/0007`): `AdminSession` (`src/session/`) é o
+  `AccessTokenSource` do `ApiClient`, guarda o token em `sessionStorage` e encerra a
+  sessão no `expiresAt` ou quando a API responde 401 a uma requisição com token.
+  Toda rota fica dentro de `RequireSession`, exceto `/login`.
 - Respostas de erro com corpo útil (ex.: `/health` 503) são dado, não exceção;
   resposta fora do contrato vira `ApiRequestError`.
 
@@ -149,5 +152,7 @@ SPA Vite, com os mesmos tokens e as mesmas receitas Tailwind.
 - I/O vira **fake nomeado** em `src/test/fakes/` (`FakeHttpBackend`,
   `FakeMatchMedia`), nunca stub inline de `fetch`. `vi.fn()` só para verificar
   interação (ex.: `onClose` chamado).
-- Fluxo de tela: `renderApp(backend, rota)` monta a aplicação real em memória.
+- Fluxo de tela: `renderApp(backend, rota)` monta a aplicação real em memória, já
+  logada; passe `signedOutSession().session` (`src/test/testSessions.ts`) como terceiro
+  argumento para testar sem sessão.
 - Consulte a tela como o usuário: por papel e nome acessível (`getByRole`).

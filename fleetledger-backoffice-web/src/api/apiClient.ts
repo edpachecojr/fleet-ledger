@@ -23,12 +23,22 @@ export function createApiClient(options: ApiClientOptions): ApiClient {
   return client
 }
 
+const AUTHORIZATION_HEADER = 'Authorization'
+const UNAUTHORIZED_STATUS = 401
+
 function bearerTokenMiddleware(accessTokenSource: AccessTokenSource): Middleware {
   return {
     onRequest({ request }) {
       const accessToken = accessTokenSource.getAccessToken()
-      if (accessToken) request.headers.set('Authorization', `Bearer ${accessToken}`)
+      if (accessToken) request.headers.set(AUTHORIZATION_HEADER, `Bearer ${accessToken}`)
       return request
+    },
+    // Só 401 de requisição que levou token encerra a sessão: o 401 do login
+    // (credencial errada) é resposta esperada, não sessão vencida.
+    onResponse({ request, response }) {
+      if (response.status === UNAUTHORIZED_STATUS && request.headers.has(AUTHORIZATION_HEADER))
+        accessTokenSource.discardAccessToken()
+      return response
     },
   }
 }

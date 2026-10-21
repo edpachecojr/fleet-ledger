@@ -9,6 +9,8 @@ public static class OptionsRegistrationExtension
         builder.AddValidatedOptions<DatabaseOptions, DatabaseOptionsValidator>(DatabaseOptions.SectionName);
         builder.AddValidatedOptions<JwtOptions, JwtOptionsValidator>(JwtOptions.SectionName);
         builder.AddValidatedOptions<CrossOriginOptions, CrossOriginOptionsValidator>(CrossOriginOptions.SectionName);
+        builder.AddValidatedOptions<AdministratorSeedOptions, AdministratorSeedOptionsValidator>(
+            AdministratorSeedOptions.SectionName);
     }
 
     // ValidateOnStart: configuração inválida derruba o boot, não a primeira requisição.
