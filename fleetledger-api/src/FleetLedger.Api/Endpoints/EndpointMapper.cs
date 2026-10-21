@@ -1,6 +1,7 @@
 using FleetLedger.Api.Common.Api;
 using FleetLedger.Api.Endpoints.Auth;
 using FleetLedger.Api.Endpoints.Customers;
+using FleetLedger.Api.Endpoints.Drivers;
 using FleetLedger.Api.Endpoints.Health;
 using FleetLedger.Api.Endpoints.LedgerAccounts;
 using FleetLedger.Api.Endpoints.Vehicles;
@@ -17,6 +18,7 @@ public static class EndpointMapper
         app.MapLedgerAccountEndpoints();
         app.MapVehicleEndpoints();
         app.MapCustomerEndpoints();
+        app.MapDriverEndpoints();
         app.MapHttpContract();
     }
 }

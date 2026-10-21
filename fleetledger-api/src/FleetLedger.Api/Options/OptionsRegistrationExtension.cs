@@ -11,6 +11,7 @@ public static class OptionsRegistrationExtension
         builder.AddValidatedOptions<CrossOriginOptions, CrossOriginOptionsValidator>(CrossOriginOptions.SectionName);
         builder.AddValidatedOptions<AdministratorSeedOptions, AdministratorSeedOptionsValidator>(
             AdministratorSeedOptions.SectionName);
+        builder.AddValidatedOptions<CalendarOptions, CalendarOptionsValidator>(CalendarOptions.SectionName);
     }
 
     // ValidateOnStart: configuração inválida derruba o boot, não a primeira requisição.

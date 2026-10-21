@@ -253,6 +253,82 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/drivers': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Lista motoristas com busca por nome ou CPF e filtro de situação documental
+     * @description isActive=true devolve só os selecionáveis em nova viagem.
+     */
+    get: operations['Drivers: List']
+    put?: never
+    /** Cadastra um motorista */
+    post: operations['Drivers: Create']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/drivers/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Detalha um motorista, com a situação documental de hoje */
+    get: operations['Drivers: Get']
+    /**
+     * Altera os dados de um motorista
+     * @description O CPF não é editável; a comissão nova não afeta viagens já abertas.
+     */
+    put: operations['Drivers: Update']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/drivers/{id}/deactivate': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Inativa o motorista; ele some da abertura de viagem */
+    post: operations['Drivers: Deactivate']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/drivers/{id}/reactivate': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Reativa o motorista */
+    post: operations['Drivers: Reactivate']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
 export type webhooks = Record<string, never>
 export interface components {
@@ -288,6 +364,39 @@ export interface components {
        * @description Prazo de pagamento em dias (opcional, 1 ou mais).
        */
       paymentTermDays?: null | number
+    }
+    /**
+     * @description Cadastro de motorista. CPF, telefone e CNH aceitam máscara; são guardados só com dígitos.
+     * @example ```new CreateDriverRequest { Name = "João da Silva", Cpf = "529.982.247-25", CnhCategory = ECnhCategory.E }```
+     */
+    CreateDriverRequest: {
+      /** @description CPF com dígitos verificadores válidos, único na organização. */
+      cpf?: string
+      /** @description Nome completo (obrigatório). */
+      name?: string
+      /** @description Telefone com DDD (obrigatório). */
+      phone?: string
+      /** @description Número da CNH com 11 dígitos, único na organização. */
+      cnhNumber?: string
+      /** @description Categoria da CNH (obrigatória). */
+      cnhCategory?: components['schemas']['ECnhCategory']
+      /**
+       * Format: date
+       * @description Validade da CNH (obrigatória).
+       */
+      cnhExpiresOn?: string
+      /**
+       * Format: date
+       * @description Validade do exame toxicológico (opcional).
+       */
+      toxicologyExamExpiresOn?: null | string
+      /**
+       * Format: double
+       * @description Comissão padrão em %, de 0 a 100, com até 2 casas.
+       */
+      defaultCommissionPercent?: number
+      /** @description Dados bancários ou chave PIX (opcional). */
+      bankDetails?: null | string
     }
     /**
      * @description Cadastro de veículo. O hodômetro atual nasce igual ao inicial.
@@ -361,10 +470,83 @@ export interface components {
       updatedAt?: string
     }
     /**
+     * @description Motorista da frota, com comissão padrão e vencimento de documentos. O CPF é a identidade
+     *     do cadastro e não muda depois de criado; com histórico, o motorista só é inativado.
+     * @example ```new Driver { Name = "João da Silva", Cpf = "52998224725", CnhCategory = ECnhCategory.E }```
+     */
+    Driver: {
+      /** Format: uuid */
+      organizationId?: string
+      /** @description Nome completo. */
+      name?: string
+      /** @description CPF só com os 11 dígitos. Imutável. */
+      cpf?: string
+      /** @description Telefone só com dígitos (DDD + número). */
+      phone?: string
+      /** @description Número da CNH (11 dígitos), único na organização. */
+      cnhNumber?: string
+      /** @description Categoria da CNH. */
+      cnhCategory?: components['schemas']['ECnhCategory']
+      /**
+       * Format: date
+       * @description Validade da CNH.
+       */
+      cnhExpiresOn?: string
+      /**
+       * Format: date
+       * @description Validade do exame toxicológico; opcional (em branco não conta na situação).
+       */
+      toxicologyExamExpiresOn?: null | string
+      /**
+       * Format: double
+       * @description Comissão padrão em % (0 a 100, 2 casas). Alterar não afeta viagens já abertas: a viagem
+       *     copia o percentual na abertura.
+       */
+      defaultCommissionPercent?: number
+      /** @description Dados bancários ou chave PIX, em texto livre, para pagar o acerto (opcional). */
+      bankDetails?: null | string
+      /** Format: date-time */
+      deactivatedAt?: null | string
+      /** @description Motorista ativo: aparece na abertura de viagem. */
+      isActive?: boolean
+      /**
+       * @description Situação documental na data de hoje, calculada pelo servidor a cada resposta; não é
+       *     persistida e não pode ser enviada pelo cliente.
+       */
+      documentStatus?: components['schemas']['EDocumentStatus']
+      /**
+       * Format: uuid
+       * @description UUID v7, gerado na aplicação e nunca pelo banco: a ordem temporal mantém o índice
+       *     da chave primária compacto e o id existe antes do primeiro `SaveChanges`.
+       */
+      id?: string
+      /**
+       * Format: date-time
+       * @description Momento da criação, em UTC. Atribuído explicitamente por quem cria a entidade.
+       */
+      createdAt?: string
+      /**
+       * Format: date-time
+       * @description Momento da última alteração, em UTC. Atribuído explicitamente por quem altera a entidade.
+       */
+      updatedAt?: string
+    }
+    /**
      * @description Periodicidade com que o cliente é faturado.
      * @enum {unknown}
      */
     EBillingCycle: 'Weekly' | 'Biweekly' | 'Monthly'
+    /**
+     * @description Categoria da CNH (Código de Trânsito Brasileiro).
+     * @enum {unknown}
+     */
+    ECnhCategory: 'A' | 'B' | 'C' | 'D' | 'E' | 'AB' | 'AC' | 'AD' | 'AE'
+    /**
+     * @description Situação dos documentos do motorista (CNH e exame toxicológico), pelo pior dos dois.
+     *     Só gera aviso na abertura de viagem, nunca bloqueio (Q1).
+     * @enum {unknown}
+     */
+    EDocumentStatus: 'Regular' | 'ExpiringSoon' | 'Expired'
     /** @enum {unknown} */
     ELedgerEntryContext: 'Trip' | 'FixedExpense' | 'Maintenance' | 'Billing' | null
     /**
@@ -524,6 +706,42 @@ export interface components {
      * @description Resposta de listagem com os metadados de página.
      * @example ```return new PagedResponse&lt;List&lt;Vehicle&gt;&gt;(vehicles, totalCount, request.PageNumber, request.PageSize);```
      */
+    PagedResponseOfListOfDriver: {
+      /**
+       * Format: int32
+       * @description Página devolvida, a partir de 1.
+       */
+      currentPage?: number
+      /**
+       * Format: int32
+       * @description Itens por página usados na consulta.
+       */
+      pageSize?: number
+      /**
+       * Format: int32
+       * @description Total de itens disponíveis em todas as páginas.
+       */
+      totalCount?: number
+      /**
+       * Format: int32
+       * @description Total de páginas; zero quando int PagedResponse&lt;TData&gt;.PageSize não é positivo.
+       */
+      totalPages?: number
+      /** @description Carga útil; nula em respostas de erro. */
+      data?: null | components['schemas']['Driver'][]
+      /** @description Mensagem para o usuário. Como exibi-la é decisão do cliente. */
+      message?: null | string
+      /**
+       * Format: int32
+       * @description Status HTTP da operação. Precisa ser público e serializado: o cliente depende dele
+       *     e, sem ele, bool Response&lt;TData&gt;.IsSuccess mente depois da desserialização (antipadrão A-02).
+       */
+      code?: number
+    }
+    /**
+     * @description Resposta de listagem com os metadados de página.
+     * @example ```return new PagedResponse&lt;List&lt;Vehicle&gt;&gt;(vehicles, totalCount, request.PageNumber, request.PageSize);```
+     */
     PagedResponseOfListOfVehicle: {
       /**
        * Format: int32
@@ -571,6 +789,22 @@ export interface components {
      */
     ResponseOfCustomer: {
       data?: null | components['schemas']['Customer']
+      /** @description Mensagem para o usuário. Como exibi-la é decisão do cliente. */
+      message?: null | string
+      /**
+       * Format: int32
+       * @description Status HTTP da operação. Precisa ser público e serializado: o cliente depende dele
+       *     e, sem ele, bool Response&lt;TData&gt;.IsSuccess mente depois da desserialização (antipadrão A-02).
+       */
+      code?: number
+    }
+    /**
+     * @description Envelope único de retorno das operações. int Response&lt;TData&gt;.Code é o status HTTP calculado
+     *     pelo handler e devolvido tal qual pelo endpoint.
+     * @example ```return new Response&lt;Vehicle?&gt;(null, 404, "Veículo não encontrado");```
+     */
+    ResponseOfDriver: {
+      data?: null | components['schemas']['Driver']
       /** @description Mensagem para o usuário. Como exibi-la é decisão do cliente. */
       message?: null | string
       /**
@@ -666,6 +900,37 @@ export interface components {
        * @description Prazo de pagamento em dias (opcional, 1 ou mais).
        */
       paymentTermDays?: null | number
+    }
+    /**
+     * @description Edição do motorista: tudo menos o CPF. A comissão nova não afeta viagens já abertas.
+     * @example ```new UpdateDriverRequest { Name = "João da Silva", DefaultCommissionPercent = 12.5m }```
+     */
+    UpdateDriverRequest: {
+      /** @description Nome completo (obrigatório). */
+      name?: string
+      /** @description Telefone com DDD (obrigatório). */
+      phone?: string
+      /** @description Número da CNH com 11 dígitos, único na organização. */
+      cnhNumber?: string
+      /** @description Categoria da CNH (obrigatória). */
+      cnhCategory?: components['schemas']['ECnhCategory']
+      /**
+       * Format: date
+       * @description Validade da CNH (obrigatória).
+       */
+      cnhExpiresOn?: string
+      /**
+       * Format: date
+       * @description Validade do exame toxicológico (opcional).
+       */
+      toxicologyExamExpiresOn?: null | string
+      /**
+       * Format: double
+       * @description Comissão padrão em %, de 0 a 100, com até 2 casas.
+       */
+      defaultCommissionPercent?: number
+      /** @description Dados bancários ou chave PIX (opcional). */
+      bankDetails?: null | string
     }
     /**
      * @description Edição do cadastro. Placa e hodômetros não são editáveis: a placa é a identidade do
@@ -1332,6 +1597,220 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ResponseOfCustomer']
+        }
+      }
+    }
+  }
+  'Drivers: List': {
+    parameters: {
+      query?: {
+        search?: string
+        isActive?: boolean
+        documentStatus?: components['schemas']['EDocumentStatus']
+        pageNumber?: number
+        pageSize?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PagedResponseOfListOfDriver']
+        }
+      }
+    }
+  }
+  'Drivers: Create': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateDriverRequest']
+      }
+    }
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfDriver']
+        }
+      }
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/problem+json': components['schemas']['HttpValidationProblemDetails']
+        }
+      }
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfDriver']
+        }
+      }
+    }
+  }
+  'Drivers: Get': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfDriver']
+        }
+      }
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfDriver']
+        }
+      }
+    }
+  }
+  'Drivers: Update': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateDriverRequest']
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfDriver']
+        }
+      }
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/problem+json': components['schemas']['HttpValidationProblemDetails']
+        }
+      }
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfDriver']
+        }
+      }
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfDriver']
+        }
+      }
+    }
+  }
+  'Drivers: Deactivate': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfDriver']
+        }
+      }
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfDriver']
+        }
+      }
+    }
+  }
+  'Drivers: Reactivate': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfDriver']
+        }
+      }
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfDriver']
         }
       }
     }

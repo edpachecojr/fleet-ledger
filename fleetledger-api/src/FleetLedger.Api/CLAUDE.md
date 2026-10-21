@@ -12,6 +12,7 @@ Common/Health/             health checks registrados e contrato da resposta
 Common/Observability/      Serilog + OpenTelemetry
 Common/Security/           Identity (política de bloqueio), JWT (validação e emissão),
                            verificação de credenciais, GetUserId, UserContext
+Common/Time/               IBusinessCalendar: "hoje" no fuso de Calendar:TimeZone
 Data/                      AppDbContext, convenções de modelo, ForOrganization,
                            Mappings/, Migrations/ (geradas — não editar à mão),
                            Seed/ (administrador, organização e Plano de Contas fixo),
@@ -63,7 +64,8 @@ public sealed class CreateVehicleEndpoint : IEndpoint
   é o que deixa o handler testável sem banco (docs/adr/0004).
 - No store, consulta de `IOrganizationOwned` sempre via `ForOrganization`; leitura com `AsNoTracking()`.
 - Dado global, sem organização (Plano de Contas), é exceção explícita e comentada.
-- Datas via `TimeProvider` injetado. Mensagens de usuário numa fábrica `<Modulo>Responses`.
+- Datas via `TimeProvider` injetado; data de negócio ("hoje", vencimentos) via `IBusinessCalendar`,
+  nunca `DateOnly.FromDateTime(DateTime.Now)`. Mensagens de usuário numa fábrica `<Modulo>Responses`.
 - Acima de 200 linhas, divida por operação.
 
 ## Data

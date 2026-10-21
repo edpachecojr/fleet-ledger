@@ -1,4 +1,4 @@
-import { formatCurrency, formatQuantity, parseLocaleNumber } from './numberFormat'
+import { formatCurrency, formatPercent, formatQuantity, parseLocaleNumber } from './numberFormat'
 
 // Intl separa "R$" do valor com espaço não separável.
 const normalizeSpaces = (text: string): string => text.replace(/\s/g, ' ')
@@ -30,5 +30,11 @@ describe('parseLocaleNumber', () => {
 
   it.each(['', 'abc', '1,2,3', '12a'])('returns null for "%s"', (input) => {
     expect(parseLocaleNumber(input)).toBeNull()
+  })
+})
+
+describe('formatPercent', () => {
+  it('formats with two decimals and a comma', () => {
+    expect(formatPercent(12.5)).toBe('12,50%')
   })
 })

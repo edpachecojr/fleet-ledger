@@ -18,7 +18,7 @@ public class AppDbContextModelTests
         => _model.GetEntityTypes().Select(entity => entity.GetTableName()).Should()
             .BeEquivalentTo(
                 "organizations", "users", "user_claims", "user_logins", "user_tokens",
-                "ledger_account_groups", "ledger_accounts", "vehicles", "customers");
+                "ledger_account_groups", "ledger_accounts", "vehicles", "customers", "drivers");
 
     [Fact]
     public void Columns_ForBaseModel_AreSnakeCase()
@@ -74,6 +74,16 @@ public class AppDbContextModelTests
     public void Customer_CnpjIsUniquePerOrganization()
         => Entity<Customer>().GetIndexes().Should().Contain(index =>
             index.IsUnique && index.GetDatabaseName() == "ix_customers_organization_id_cnpj");
+
+    [Theory]
+    [InlineData("ix_drivers_organization_id_cpf")]
+    [InlineData("ix_drivers_organization_id_cnh_number")]
+    public void Driver_CpfAndCnhAreUniquePerOrganization(string indexName)
+        => Entity<Driver>().GetIndexes().Should().Contain(index => index.IsUnique && index.GetDatabaseName() == indexName);
+
+    [Fact]
+    public void Driver_DocumentStatusIsCalculatedAndNotStored()
+        => Entity<Driver>().FindProperty(nameof(Driver.DocumentStatus)).Should().BeNull();
 
     [Fact]
     public void Vehicle_IsActiveIsDerivedAndNotStored()

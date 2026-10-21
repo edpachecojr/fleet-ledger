@@ -1,4 +1,4 @@
-import { LayoutGrid, ListTree, SquareUserRound, Truck, type LucideIcon } from 'lucide-react'
+import { IdCard, LayoutGrid, ListTree, SquareUserRound, Truck, type LucideIcon } from 'lucide-react'
 import { RoutePath } from '@/app/routePaths'
 
 export interface NavigationItem {
@@ -20,6 +20,7 @@ export const NAVIGATION_SECTIONS: readonly NavigationSection[] = [
     items: [
       { label: 'Veículos', path: RoutePath.vehicles, icon: Truck },
       { label: 'Clientes', path: RoutePath.customers, icon: SquareUserRound },
+      { label: 'Motoristas', path: RoutePath.drivers, icon: IdCard },
     ],
   },
   {

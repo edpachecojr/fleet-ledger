@@ -183,6 +183,96 @@ namespace FleetLedger.Api.Data.Migrations
                     b.ToTable("customers", (string)null);
                 });
 
+            modelBuilder.Entity("FleetLedger.Core.Models.Driver", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("BankDetails")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("bank_details");
+
+                    b.Property<int>("CnhCategory")
+                        .HasColumnType("integer")
+                        .HasColumnName("cnh_category");
+
+                    b.Property<DateOnly>("CnhExpiresOn")
+                        .HasColumnType("date")
+                        .HasColumnName("cnh_expires_on");
+
+                    b.Property<string>("CnhNumber")
+                        .IsRequired()
+                        .HasMaxLength(11)
+                        .HasColumnType("character(11)")
+                        .HasColumnName("cnh_number")
+                        .IsFixedLength();
+
+                    b.Property<string>("Cpf")
+                        .IsRequired()
+                        .HasMaxLength(11)
+                        .HasColumnType("character(11)")
+                        .HasColumnName("cpf")
+                        .IsFixedLength();
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasPrecision(6)
+                        .HasColumnType("timestamp(6) with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTimeOffset?>("DeactivatedAt")
+                        .HasPrecision(6)
+                        .HasColumnType("timestamp(6) with time zone")
+                        .HasColumnName("deactivated_at");
+
+                    b.Property<decimal>("DefaultCommissionPercent")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)")
+                        .HasColumnName("default_commission_percent");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("character varying(160)")
+                        .HasColumnName("name");
+
+                    b.Property<Guid>("OrganizationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("organization_id");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(11)
+                        .HasColumnType("character varying(11)")
+                        .HasColumnName("phone");
+
+                    b.Property<DateOnly?>("ToxicologyExamExpiresOn")
+                        .HasColumnType("date")
+                        .HasColumnName("toxicology_exam_expires_on");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasPrecision(6)
+                        .HasColumnType("timestamp(6) with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_drivers");
+
+                    b.HasIndex("OrganizationId")
+                        .HasDatabaseName("ix_drivers_organization_id");
+
+                    b.HasIndex("OrganizationId", "CnhNumber")
+                        .IsUnique()
+                        .HasDatabaseName("ix_drivers_organization_id_cnh_number");
+
+                    b.HasIndex("OrganizationId", "Cpf")
+                        .IsUnique()
+                        .HasDatabaseName("ix_drivers_organization_id_cpf");
+
+                    b.ToTable("drivers", (string)null);
+                });
+
             modelBuilder.Entity("FleetLedger.Core.Models.LedgerAccount", b =>
                 {
                     b.Property<Guid>("Id")
@@ -708,6 +798,16 @@ namespace FleetLedger.Api.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_customers_organizations_organization_id");
+                });
+
+            modelBuilder.Entity("FleetLedger.Core.Models.Driver", b =>
+                {
+                    b.HasOne("FleetLedger.Core.Models.Organization", null)
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_drivers_organizations_organization_id");
                 });
 
             modelBuilder.Entity("FleetLedger.Core.Models.LedgerAccount", b =>

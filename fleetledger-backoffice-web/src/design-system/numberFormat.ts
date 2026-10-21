@@ -37,3 +37,13 @@ function normalizeDecimalSeparators(input: string): string {
   if (input.includes(',')) return input.replaceAll('.', '').replace(',', '.')
   return THOUSANDS_ONLY.test(input) ? input.replaceAll('.', '') : input
 }
+
+const PERCENT = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+
+/**
+ * Percentual com 2 casas.
+ * @example formatPercent(12.5) // '12,50%'
+ */
+export function formatPercent(value: number): string {
+  return `${PERCENT.format(value)}%`
+}

@@ -3,6 +3,9 @@ import { ChartOfAccountsPage } from '@/features/chart-of-accounts/ChartOfAccount
 import { CustomerDetailPage } from '@/features/customers/CustomerDetailPage'
 import { CustomersPage } from '@/features/customers/CustomersPage'
 import { NewCustomerPage } from '@/features/customers/NewCustomerPage'
+import { DriverDetailPage } from '@/features/drivers/DriverDetailPage'
+import { DriversPage } from '@/features/drivers/DriversPage'
+import { NewDriverPage } from '@/features/drivers/NewDriverPage'
 import { LoginPage } from '@/features/login/LoginPage'
 import { NewVehiclePage } from '@/features/vehicles/NewVehiclePage'
 import { VehicleDetailPage } from '@/features/vehicles/VehicleDetailPage'
@@ -32,6 +35,9 @@ export const APP_ROUTES: RouteObject[] = [
       { path: RoutePath.customers, element: <CustomersPage /> },
       { path: RoutePath.newCustomer, element: <NewCustomerPage /> },
       { path: RoutePath.customerDetail, element: <CustomerDetailPage /> },
+      { path: RoutePath.drivers, element: <DriversPage /> },
+      { path: RoutePath.newDriver, element: <NewDriverPage /> },
+      { path: RoutePath.driverDetail, element: <DriverDetailPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },
