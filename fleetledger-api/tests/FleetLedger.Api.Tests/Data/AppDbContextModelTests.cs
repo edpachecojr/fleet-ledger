@@ -1,4 +1,5 @@
 using FleetLedger.Api.Data;
+using FleetLedger.Api.Data.Seed;
 using FleetLedger.Api.Models;
 using FleetLedger.Api.Tests.Fixtures;
 using FleetLedger.Core.Models;
@@ -15,7 +16,9 @@ public class AppDbContextModelTests
     [Fact]
     public void Tables_ForEveryEntity_AreSnakeCasePluralWithoutAspNetPrefix()
         => _model.GetEntityTypes().Select(entity => entity.GetTableName()).Should()
-            .BeEquivalentTo("organizations", "users", "user_claims", "user_logins", "user_tokens");
+            .BeEquivalentTo(
+                "organizations", "users", "user_claims", "user_logins", "user_tokens",
+                "ledger_account_groups", "ledger_accounts");
 
     [Fact]
     public void Columns_ForBaseModel_AreSnakeCase()
@@ -51,6 +54,16 @@ public class AppDbContextModelTests
         => _model.GetEntityTypes().SelectMany(entity => entity.GetForeignKeys())
             .Select(foreignKey => foreignKey.GetConstraintName())
             .Should().NotContain(name => name!.Contains("asp_net"));
+
+    [Fact]
+    public void ChartOfAccounts_IsSeededByTheMigrationWithoutOrganization()
+    {
+        IEntityType account = Entity<LedgerAccount>();
+
+        account.GetSeedData().Should().HaveCount(ChartOfAccountsCatalog.Accounts.Count);
+        Entity<LedgerAccountGroup>().GetSeedData().Should().HaveCount(ChartOfAccountsCatalog.Groups.Count);
+        account.FindProperty(nameof(IOrganizationOwned.OrganizationId)).Should().BeNull();
+    }
 
     private IEntityType Entity<TEntity>() => _model.FindEntityType(typeof(TEntity))!;
 

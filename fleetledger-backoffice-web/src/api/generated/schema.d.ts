@@ -44,10 +44,49 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/ledger-accounts': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Lista o Plano de Contas: grupos da DRE com suas contas */
+    get: operations['LedgerAccounts: ListChart']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/ledger-accounts/selectable': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Lista as contas que aceitam lançamento manual num contexto
+     * @description Contas sistêmicas (provisão, adiantamento, comissão) nunca aparecem.
+     */
+    get: operations['LedgerAccounts: ListSelectable']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
 export type webhooks = Record<string, never>
 export interface components {
   schemas: {
+    /** @enum {unknown} */
+    ELedgerEntryContext: 'Trip' | 'FixedExpense' | 'Maintenance' | 'Billing' | null
     HealthCheckEntryResponse: {
       name: string
       status: components['schemas']['HealthStatus']
@@ -88,8 +127,69 @@ export interface components {
       expiresAt: string
     }
     /**
-     * @description Credenciais do administrador para obter um access token. Não herda Request:
-     *     é a única requisição anônima, e ainda não existe organização a atribuir.
+     * @description Conta analítica do Plano de Contas, onde os lançamentos são classificados.
+     *     Fixa: gravada pela migration, sem criação, edição ou exclusão pelo administrador.
+     * @example ```new LedgerAccount { Code = "3.01", Name = "Combustível", EntryContext = ELedgerEntryContext.Trip }```
+     */
+    LedgerAccount: {
+      /** @description Código hierárquico ("3.01"): o prefixo é o código do grupo. */
+      code?: string
+      /** @description Nome de exibição da conta. */
+      name?: string
+      /**
+       * Format: uuid
+       * @description Grupo da DRE a que a conta pertence.
+       */
+      groupId?: string
+      entryContext?: null | components['schemas']['ELedgerEntryContext']
+      /**
+       * Format: uuid
+       * @description UUID v7, gerado na aplicação e nunca pelo banco: a ordem temporal mantém o índice
+       *     da chave primária compacto e o id existe antes do primeiro `SaveChanges`.
+       */
+      id?: string
+      /**
+       * Format: date-time
+       * @description Momento da criação, em UTC. Atribuído explicitamente por quem cria a entidade.
+       */
+      createdAt?: string
+      /**
+       * Format: date-time
+       * @description Momento da última alteração, em UTC. Atribuído explicitamente por quem altera a entidade.
+       */
+      updatedAt?: string
+    }
+    /**
+     * @description Grupo da DRE do Plano de Contas (ex.: "Custos fixos"). Define em que linha do
+     *     demonstrativo as contas dele aparecem. Fixo: gravado pela migration, sem edição.
+     * @example ```new LedgerAccountGroup { Code = "6", Name = "Custos fixos" }```
+     */
+    LedgerAccountGroup: {
+      /** @description Código hierárquico do grupo ("1", "2"…), na ordem da DRE. */
+      code?: string
+      /** @description Nome de exibição do grupo. */
+      name?: string
+      /** @description Contas analíticas do grupo, ordenadas pelo código. */
+      accounts?: components['schemas']['LedgerAccount'][]
+      /**
+       * Format: uuid
+       * @description UUID v7, gerado na aplicação e nunca pelo banco: a ordem temporal mantém o índice
+       *     da chave primária compacto e o id existe antes do primeiro `SaveChanges`.
+       */
+      id?: string
+      /**
+       * Format: date-time
+       * @description Momento da criação, em UTC. Atribuído explicitamente por quem cria a entidade.
+       */
+      createdAt?: string
+      /**
+       * Format: date-time
+       * @description Momento da última alteração, em UTC. Atribuído explicitamente por quem altera a entidade.
+       */
+      updatedAt?: string
+    }
+    /**
+     * @description Credenciais do administrador para obter um access token.
      * @example ```new LoginRequest { Email = "gestor@empresa.com.br", Password = "..." }```
      */
     LoginRequest: {
@@ -98,6 +198,14 @@ export interface components {
       /** @description Senha em texto, só em trânsito (HTTPS); nunca é registrada em log. */
       password?: string
     }
+    ProblemDetails: {
+      type?: null | string
+      title?: null | string
+      /** Format: int32 */
+      status?: null | number
+      detail?: null | string
+      instance?: null | string
+    }
     /**
      * @description Envelope único de retorno das operações. int Response&lt;TData&gt;.Code é o status HTTP calculado
      *     pelo handler e devolvido tal qual pelo endpoint.
@@ -105,6 +213,40 @@ export interface components {
      */
     ResponseOfIssuedAccessToken: {
       data?: null | components['schemas']['IssuedAccessToken']
+      /** @description Mensagem para o usuário. Como exibi-la é decisão do cliente. */
+      message?: null | string
+      /**
+       * Format: int32
+       * @description Status HTTP da operação. Precisa ser público e serializado: o cliente depende dele
+       *     e, sem ele, bool Response&lt;TData&gt;.IsSuccess mente depois da desserialização (antipadrão A-02).
+       */
+      code?: number
+    }
+    /**
+     * @description Envelope único de retorno das operações. int Response&lt;TData&gt;.Code é o status HTTP calculado
+     *     pelo handler e devolvido tal qual pelo endpoint.
+     * @example ```return new Response&lt;Vehicle?&gt;(null, 404, "Veículo não encontrado");```
+     */
+    ResponseOfListOfLedgerAccount: {
+      /** @description Carga útil; nula em respostas de erro. */
+      data?: null | components['schemas']['LedgerAccount'][]
+      /** @description Mensagem para o usuário. Como exibi-la é decisão do cliente. */
+      message?: null | string
+      /**
+       * Format: int32
+       * @description Status HTTP da operação. Precisa ser público e serializado: o cliente depende dele
+       *     e, sem ele, bool Response&lt;TData&gt;.IsSuccess mente depois da desserialização (antipadrão A-02).
+       */
+      code?: number
+    }
+    /**
+     * @description Envelope único de retorno das operações. int Response&lt;TData&gt;.Code é o status HTTP calculado
+     *     pelo handler e devolvido tal qual pelo endpoint.
+     * @example ```return new Response&lt;Vehicle?&gt;(null, 404, "Veículo não encontrado");```
+     */
+    ResponseOfListOfLedgerAccountGroup: {
+      /** @description Carga útil; nula em respostas de erro. */
+      data?: null | components['schemas']['LedgerAccountGroup'][]
       /** @description Mensagem para o usuário. Como exibi-la é decisão do cliente. */
       message?: null | string
       /**
@@ -190,6 +332,57 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ResponseOfIssuedAccessToken']
+        }
+      }
+    }
+  }
+  'LedgerAccounts: ListChart': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfListOfLedgerAccountGroup']
+        }
+      }
+    }
+  }
+  'LedgerAccounts: ListSelectable': {
+    parameters: {
+      query: {
+        entryContext: components['schemas']['ELedgerEntryContext']
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfListOfLedgerAccount']
+        }
+      }
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails']
         }
       }
     }

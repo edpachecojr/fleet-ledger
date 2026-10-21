@@ -14,9 +14,10 @@ Common/Security/           Identity (política de bloqueio), JWT (validação e 
                            verificação de credenciais, GetUserId, UserContext
 Data/                      AppDbContext, convenções de modelo, ForOrganization,
                            Mappings/, Migrations/ (geradas — não editar à mão),
-                           Seed/ (administrador e organização iniciais)
+                           Seed/ (administrador, organização e Plano de Contas fixo),
+                           Stores/<Modulo>/ (acesso a dados de cada handler)
 Endpoints/                 EndpointMapper + <Modulo>/ (um arquivo por rota; Health/ é o molde)
-Handlers/<Modulo>/         regra de negócio (Auth/ é o primeiro)
+Handlers/<Modulo>/         regra de negócio (Auth/, LedgerAccounts/…)
 Models/                    SOMENTE entidades acopladas à infra (User : IdentityUser)
 Options/                   Options + validador de cada seção de configuração
 ```
@@ -58,7 +59,10 @@ public sealed class CreateVehicleEndpoint : IEndpoint
 ## Handlers
 
 - Implementam a interface de `Core`; injeção por construtor primário.
-- Consulta de `IOrganizationOwned` sempre via `ForOrganization`; leitura com `AsNoTracking()`.
+- Dados só pelo `I<Entidade>Store` do módulo (`Data/Stores/`), nunca pelo `AppDbContext`:
+  é o que deixa o handler testável sem banco (docs/adr/0004).
+- No store, consulta de `IOrganizationOwned` sempre via `ForOrganization`; leitura com `AsNoTracking()`.
+- Dado global, sem organização (Plano de Contas), é exceção explícita e comentada.
 - Datas via `TimeProvider` injetado. Mensagens de usuário numa fábrica `<Modulo>Responses`.
 - Acima de 200 linhas, divida por operação.
 

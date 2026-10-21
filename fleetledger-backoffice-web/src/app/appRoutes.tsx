@@ -1,4 +1,5 @@
 import type { RouteObject } from 'react-router'
+import { ChartOfAccountsPage } from '@/features/chart-of-accounts/ChartOfAccountsPage'
 import { LoginPage } from '@/features/login/LoginPage'
 import { OverviewPage } from '@/features/overview/OverviewPage'
 import { NotFoundPage } from '@/features/not-found/NotFoundPage'
@@ -18,6 +19,7 @@ export const APP_ROUTES: RouteObject[] = [
     ),
     children: [
       { index: true, element: <OverviewPage /> },
+      { path: RoutePath.chartOfAccounts, element: <ChartOfAccountsPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },

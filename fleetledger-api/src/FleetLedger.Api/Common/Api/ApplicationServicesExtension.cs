@@ -1,4 +1,6 @@
+using FleetLedger.Api.Data.Stores.LedgerAccounts;
 using FleetLedger.Api.Handlers.Auth;
+using FleetLedger.Api.Handlers.LedgerAccounts;
 using FleetLedger.Core.Handlers;
 
 namespace FleetLedger.Api.Common.Api;
@@ -11,5 +13,8 @@ public static class ApplicationServicesExtension
         builder.Services.AddHybridCache();
 
         builder.Services.AddScoped<IAuthHandler, AuthHandler>();
+
+        builder.Services.AddScoped<ILedgerAccountStore, LedgerAccountStore>();
+        builder.Services.AddScoped<ILedgerAccountHandler, LedgerAccountHandler>();
     }
 }

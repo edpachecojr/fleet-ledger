@@ -11,6 +11,8 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
     : IdentityUserContext<User, Guid>(options)
 {
     public DbSet<Organization> Organizations => Set<Organization>();
+    public DbSet<LedgerAccountGroup> LedgerAccountGroups => Set<LedgerAccountGroup>();
+    public DbSet<LedgerAccount> LedgerAccounts => Set<LedgerAccount>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

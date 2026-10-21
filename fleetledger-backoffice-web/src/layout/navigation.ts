@@ -1,4 +1,4 @@
-import { LayoutGrid, type LucideIcon } from 'lucide-react'
+import { LayoutGrid, ListTree, type LucideIcon } from 'lucide-react'
 import { RoutePath } from '@/app/routePaths'
 
 export interface NavigationItem {
@@ -15,6 +15,10 @@ export interface NavigationSection {
 // Cada módulo entregue acrescenta seu item aqui (ver docs/ROADMAP.md).
 export const NAVIGATION_SECTIONS: readonly NavigationSection[] = [
   { label: 'Dashboards', items: [{ label: 'Visão geral', path: RoutePath.overview, icon: LayoutGrid }] },
+  {
+    label: 'Financeiro',
+    items: [{ label: 'Plano de contas', path: RoutePath.chartOfAccounts, icon: ListTree }],
+  },
 ]
 
 /**
