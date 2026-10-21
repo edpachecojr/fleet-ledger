@@ -89,7 +89,7 @@ export interface paths {
       cookie?: never
     }
     /**
-     * Lista veículos com busca por placa ou modelo
+     * Lista veículos com busca por placa ou modelo e filtro por status
      * @description allocatable=true devolve só os elegíveis para nova viagem (ativos e disponíveis).
      */
     get: operations['Vehicles: List']
@@ -116,6 +116,26 @@ export interface paths {
      * @description Placa e hodômetro não são editáveis.
      */
     put: operations['Vehicles: Update']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/vehicles/{id}/status': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /**
+     * Coloca o veículo em manutenção ou o devolve para Disponível
+     * @description Em viagem é definido só pelo sistema; veículo em viagem ou inativo responde 409.
+     */
+    put: operations['Vehicles: ChangeStatus']
     post?: never
     delete?: never
     options?: never
@@ -161,6 +181,15 @@ export interface paths {
 export type webhooks = Record<string, never>
 export interface components {
   schemas: {
+    /**
+     * @description Troca manual do status operacional: só entre Disponível e Em manutenção. "Em viagem" é
+     *     definido apenas pelo sistema (TASK-005).
+     * @example ```new ChangeVehicleStatusRequest { Status = EVehicleStatus.InMaintenance }```
+     */
+    ChangeVehicleStatusRequest: {
+      /** @description Novo status: EVehicleStatus.Available ou EVehicleStatus.InMaintenance. */
+      status?: components['schemas']['EVehicleStatus']
+    }
     /**
      * @description Cadastro de veículo. O hodômetro atual nasce igual ao inicial.
      * @example ```new CreateVehicleRequest { Plate = "ABC1D23", Model = "Volvo FH 540", CapacityKg = 27000 }```
@@ -628,6 +657,7 @@ export interface operations {
     parameters: {
       query?: {
         search?: string
+        status?: components['schemas']['EVehicleStatus']
         isActive?: boolean
         allocatable?: boolean
         pageNumber?: number
@@ -758,6 +788,59 @@ export interface operations {
       }
       /** @description Not Found */
       404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfVehicle']
+        }
+      }
+    }
+  }
+  'Vehicles: ChangeStatus': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ChangeVehicleStatusRequest']
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfVehicle']
+        }
+      }
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/problem+json': components['schemas']['HttpValidationProblemDetails']
+        }
+      }
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResponseOfVehicle']
+        }
+      }
+      /** @description Conflict */
+      409: {
         headers: {
           [name: string]: unknown
         }

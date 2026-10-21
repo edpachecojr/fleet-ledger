@@ -6,24 +6,28 @@ import {
   INITIAL_LIST_QUERY,
   isActivityFilter,
   LIST_PAGE_SIZE,
-  type ListQuery,
 } from '@/api/listQuery'
 import { ButtonLink } from '@/design-system/components/ButtonLink'
 import { Card } from '@/design-system/components/Card'
 import { DataTable } from '@/design-system/components/DataTable'
 import { DataTableToolbar } from '@/design-system/components/DataTableToolbar'
 import { EmptyState } from '@/design-system/components/EmptyState'
-import { SelectField } from '@/design-system/components/SelectField'
 import { Skeleton } from '@/design-system/components/Skeleton'
 import { TablePagination } from '@/design-system/components/TablePagination'
+import { ToolbarFilter } from '@/design-system/components/ToolbarFilter'
 import { ToolbarSearch } from '@/design-system/components/ToolbarSearch'
 import { useVehicles } from './useVehicles'
-import type { VehiclePage } from './vehicle'
+import {
+  isVehicleStatusFilter,
+  VEHICLE_STATUS_FILTER_OPTIONS,
+  type VehicleListQuery,
+  type VehiclePage,
+} from './vehicle'
 import { VEHICLE_TABLE_COLUMNS } from './VehicleTableColumns'
 
-/** Listagem da frota (card DataTable): busca por placa/modelo, filtro de situação e paginação. */
+/** Listagem da frota (card DataTable): busca por placa/modelo, filtros de situação e status, paginação. */
 export function VehicleListCard(): ReactNode {
-  const [query, setQuery] = useState<ListQuery>(INITIAL_LIST_QUERY)
+  const [query, setQuery] = useState<VehicleListQuery>({ ...INITIAL_LIST_QUERY, status: 'all' })
   const vehicles = useVehicles(query)
 
   return (
@@ -37,12 +41,18 @@ export function VehicleListCard(): ReactNode {
 }
 
 interface QueryControlsProps {
-  query: ListQuery
-  onChange: (query: ListQuery) => void
+  query: VehicleListQuery
+  onChange: (query: VehicleListQuery) => void
 }
 
-// Mudar a busca ou o filtro volta para a primeira página.
+type RefineVehicleQuery = (change: Partial<VehicleListQuery>) => void
+
+// Mudar a busca ou um filtro volta para a primeira página.
 function VehicleListToolbar({ query, onChange }: QueryControlsProps): ReactNode {
+  const refine: RefineVehicleQuery = (change) => {
+    onChange({ ...query, ...change, page: 1 })
+  }
+
   return (
     <DataTableToolbar>
       <ToolbarSearch
@@ -50,21 +60,40 @@ function VehicleListToolbar({ query, onChange }: QueryControlsProps): ReactNode 
         placeholder="Buscar por placa ou modelo…"
         value={query.search}
         onChange={(search) => {
-          onChange({ ...query, search, page: 1 })
+          refine({ search })
         }}
       />
-      <SelectField
+      <VehicleListFilters query={query} refine={refine} />
+    </DataTableToolbar>
+  )
+}
+
+function VehicleListFilters({
+  query,
+  refine,
+}: {
+  query: VehicleListQuery
+  refine: RefineVehicleQuery
+}): ReactNode {
+  return (
+    <>
+      <ToolbarFilter
         label="Situação"
-        labelHidden
-        className="w-40"
         options={ACTIVITY_FILTER_OPTIONS}
         value={query.activity}
-        onChange={(event) => {
-          if (isActivityFilter(event.target.value))
-            onChange({ ...query, activity: event.target.value, page: 1 })
+        onChange={(activity) => {
+          if (isActivityFilter(activity)) refine({ activity })
         }}
       />
-    </DataTableToolbar>
+      <ToolbarFilter
+        label="Status"
+        options={VEHICLE_STATUS_FILTER_OPTIONS}
+        value={query.status}
+        onChange={(status) => {
+          if (isVehicleStatusFilter(status)) refine({ status })
+        }}
+      />
+    </>
   )
 }
 

@@ -152,6 +152,66 @@ public class VehicleHandlerTests
         result.Data.Should().BeEquivalentTo(new { IsActive = true, DeactivatedAt = (DateTimeOffset?)null });
     }
 
+    [Fact]
+    public async Task ChangeStatusAsync_FromAvailableToMaintenance_SavesTheNewStatus()
+    {
+        Vehicle vehicle = _store.With(VehicleFactory.Create(_organizationId)).Vehicles[0];
+
+        Response<Vehicle?> result = await _handler.ChangeStatusAsync(StatusRequest(vehicle.Id, EVehicleStatus.InMaintenance), CancellationToken.None);
+
+        result.Data.Should().BeEquivalentTo(new { Status = EVehicleStatus.InMaintenance, UpdatedAt = FakeTimeProvider.ReferenceNow });
+        _store.SaveCount.Should().Be(1);
+    }
+
+    [Fact]
+    public async Task ChangeStatusAsync_WhenOnTrip_Returns409AndKeepsTheStatus()
+    {
+        Vehicle vehicle = _store.With(VehicleFactory.Create(_organizationId, status: EVehicleStatus.OnTrip)).Vehicles[0];
+
+        Response<Vehicle?> result = await _handler.ChangeStatusAsync(StatusRequest(vehicle.Id, EVehicleStatus.InMaintenance), CancellationToken.None);
+
+        result.Code.Should().Be(409);
+        result.Message.Should().Contain("em viagem");
+        vehicle.Status.Should().Be(EVehicleStatus.OnTrip);
+    }
+
+    [Fact]
+    public async Task ChangeStatusAsync_WhenInactive_Returns409AskingToReactivate()
+    {
+        Vehicle vehicle = _store.With(VehicleFactory.Create(_organizationId, deactivatedAt: FakeTimeProvider.ReferenceNow)).Vehicles[0];
+
+        Response<Vehicle?> result = await _handler.ChangeStatusAsync(StatusRequest(vehicle.Id, EVehicleStatus.InMaintenance), CancellationToken.None);
+
+        result.Code.Should().Be(409);
+        result.Message.Should().Contain("Reative");
+        _store.SaveCount.Should().Be(0);
+    }
+
+    [Fact]
+    public async Task ChangeStatusAsync_ToTheCurrentStatus_ReturnsTheVehicleWithoutSaving()
+    {
+        Vehicle vehicle = _store.With(VehicleFactory.Create(_organizationId)).Vehicles[0];
+
+        Response<Vehicle?> result = await _handler.ChangeStatusAsync(StatusRequest(vehicle.Id, EVehicleStatus.Available), CancellationToken.None);
+
+        result.Code.Should().Be(200);
+        _store.SaveCount.Should().Be(0);
+    }
+
+    [Fact]
+    public async Task ChangeStatusAsync_OnAnotherOrganizationsVehicle_Returns404()
+    {
+        Vehicle foreign = _store.With(VehicleFactory.Create(_otherOrganizationId)).Vehicles[0];
+
+        Response<Vehicle?> result = await _handler.ChangeStatusAsync(StatusRequest(foreign.Id, EVehicleStatus.InMaintenance), CancellationToken.None);
+
+        result.Code.Should().Be(404);
+        foreign.Status.Should().Be(EVehicleStatus.Available);
+    }
+
+    private ChangeVehicleStatusRequest StatusRequest(Guid vehicleId, EVehicleStatus status)
+        => new() { Id = vehicleId, OrganizationId = _organizationId, Status = status };
+
     private CreateVehicleRequest CreateRequest(string plate)
         => new()
         {

@@ -1,4 +1,6 @@
 import type { components } from '@/api/generated/schema'
+import type { ListQuery } from '@/api/listQuery'
+import type { SelectOption } from '@/design-system/components/SelectField'
 import type { BadgeTone } from '@/design-system/components/Badge'
 import { formatCurrency } from '@/design-system/numberFormat'
 
@@ -17,6 +19,24 @@ const STATUS_PRESENTATION: Record<VehicleStatus, BadgePresentation> = {
   Available: { label: 'Disponível', tone: 'success' },
   OnTrip: { label: 'Em viagem', tone: 'info' },
   InMaintenance: { label: 'Em manutenção', tone: 'warning' },
+}
+
+export type VehicleStatusFilter = VehicleStatus | 'all'
+
+/** Listagem de veículos: busca, situação e página comuns, mais o status operacional. */
+export interface VehicleListQuery extends ListQuery {
+  status: VehicleStatusFilter
+}
+
+export const VEHICLE_STATUS_FILTER_OPTIONS: readonly SelectOption[] = [
+  { value: 'all', label: 'Todos os status' },
+  { value: 'Available', label: STATUS_PRESENTATION.Available.label },
+  { value: 'OnTrip', label: STATUS_PRESENTATION.OnTrip.label },
+  { value: 'InMaintenance', label: STATUS_PRESENTATION.InMaintenance.label },
+]
+
+export function isVehicleStatusFilter(value: string): value is VehicleStatusFilter {
+  return VEHICLE_STATUS_FILTER_OPTIONS.some((option) => option.value === value)
 }
 
 const ACTIVE: BadgePresentation = { label: 'Ativo', tone: 'success' }

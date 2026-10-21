@@ -56,6 +56,27 @@ describe('VehiclesPage', () => {
     })
   })
 
+  it('filters by operational status', async () => {
+    const backend = backendWith()
+    const { user } = renderApp(backend, '/veiculos')
+    await screen.findByRole('row', { name: /ABC1D23/ })
+
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Status' }), 'Em manutenção')
+
+    await waitFor(() => {
+      expect(lastListUrl(backend).searchParams.get('status')).toBe('InMaintenance')
+    })
+  })
+
+  it('sends no status filter while showing every status', async () => {
+    const backend = backendWith()
+    renderApp(backend, '/veiculos')
+
+    await screen.findByRole('row', { name: /ABC1D23/ })
+
+    expect(lastListUrl(backend).searchParams.has('status')).toBe(false)
+  })
+
   it('shows the empty state with the create action when nothing matches', async () => {
     renderApp(backendWith([]), '/veiculos')
 

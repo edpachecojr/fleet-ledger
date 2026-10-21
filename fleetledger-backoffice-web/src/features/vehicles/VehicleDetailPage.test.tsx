@@ -76,6 +76,49 @@ describe('VehicleDetailPage', () => {
     })
   })
 
+  it('puts an available vehicle in maintenance', async () => {
+    const backend = backendWith().respondWithJson(`PUT /api/v1/vehicles/${VEHICLE_ID}/status`, {
+      status: 200,
+      body: vehicleBody(vehicleFixture({ status: 'InMaintenance' })),
+    })
+    const { user } = renderApp(backend, DETAIL_PAGE)
+
+    await user.click(await screen.findByRole('button', { name: 'Colocar em manutenção' }))
+
+    await waitFor(() => {
+      expect(backend.receivedRequests.some((request) => request.url.endsWith('/status'))).toBe(true)
+    })
+    const change = backend.receivedRequests.find((request) => request.url.endsWith('/status'))
+    expect(await change?.json()).toEqual({ status: 'InMaintenance' })
+  })
+
+  it('releases a vehicle in maintenance', async () => {
+    renderApp(backendWith(vehicleFixture({ status: 'InMaintenance' })), DETAIL_PAGE)
+
+    expect(await screen.findByRole('button', { name: 'Liberar para uso' })).toBeInTheDocument()
+  })
+
+  it('offers no manual status change while the vehicle is on trip', async () => {
+    renderApp(backendWith(vehicleFixture({ status: 'OnTrip' })), DETAIL_PAGE)
+
+    await screen.findByRole('heading', { level: 1, name: 'ABC1D23' })
+
+    expect(screen.queryByRole('button', { name: /manutenção|Liberar/ })).not.toBeInTheDocument()
+    expect(screen.getAllByText('Em viagem').length).toBeGreaterThan(0)
+  })
+
+  it('shows the API refusal of a status change', async () => {
+    const backend = backendWith().respondWithJson(`PUT /api/v1/vehicles/${VEHICLE_ID}/status`, {
+      status: 409,
+      body: { data: null, code: 409, message: 'O veículo ABC1D23 está em viagem.' },
+    })
+    const { user } = renderApp(backend, DETAIL_PAGE)
+
+    await user.click(await screen.findByRole('button', { name: 'Colocar em manutenção' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('O veículo ABC1D23 está em viagem.')
+  })
+
   it('tells when the vehicle does not exist', async () => {
     renderApp(
       new FakeHttpBackend().respondWithJson(DETAIL_ROUTE, {

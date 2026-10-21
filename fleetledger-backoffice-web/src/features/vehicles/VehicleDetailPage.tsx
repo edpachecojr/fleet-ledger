@@ -11,6 +11,7 @@ import { useVehicle } from './useVehicles'
 import type { Vehicle } from './vehicle'
 import { VehicleActivityAction } from './VehicleActivityAction'
 import { VehicleEditForm } from './VehicleEditForm'
+import { VehicleStatusAction } from './VehicleStatusAction'
 import { VehicleSummaryCard } from './VehicleSummaryCard'
 
 export function VehicleDetailPage(): ReactNode {
@@ -36,12 +37,21 @@ function VehicleDetail({ vehicle }: { vehicle: Vehicle }): ReactNode {
       <PageHeader
         title={vehicle.plate ?? ''}
         description={vehicle.model ?? ''}
-        actions={<VehicleActivityAction vehicle={vehicle} />}
+        actions={<VehicleHeaderActions vehicle={vehicle} />}
       />
       <div className="grid items-start gap-6 lg:grid-cols-[1fr_2fr]">
         <VehicleSummaryCard vehicle={vehicle} />
         <VehicleEditForm vehicle={vehicle} />
       </div>
+    </>
+  )
+}
+
+function VehicleHeaderActions({ vehicle }: { vehicle: Vehicle }): ReactNode {
+  return (
+    <>
+      <VehicleStatusAction vehicle={vehicle} />
+      <VehicleActivityAction vehicle={vehicle} />
     </>
   )
 }

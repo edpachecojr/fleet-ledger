@@ -2,6 +2,7 @@ import { useMutation, useQueryClient, type UseMutationResult } from '@tanstack/r
 import { useApiClient } from '@/api/ApiClientContext'
 import type { MutationOutcome } from '@/api/mutationOutcome'
 import { changeVehicleActivity, type VehicleActivityAction } from './changeVehicleActivity'
+import { changeVehicleStatus, type ManualVehicleStatus } from './changeVehicleStatus'
 import { createVehicle } from './createVehicle'
 import { updateVehicle } from './updateVehicle'
 import { VEHICLES_QUERY_KEY } from './useVehicles'
@@ -29,6 +30,14 @@ export function useChangeVehicleActivity(vehicleId: string): VehicleMutation<Veh
   const client = useApiClient()
   return useMutation({
     mutationFn: (action: VehicleActivityAction) => changeVehicleActivity(client, { vehicleId, action }),
+    onSuccess: useInvalidateVehiclesOnSave(),
+  })
+}
+
+export function useChangeVehicleStatus(vehicleId: string): VehicleMutation<ManualVehicleStatus> {
+  const client = useApiClient()
+  return useMutation({
+    mutationFn: (status: ManualVehicleStatus) => changeVehicleStatus(client, { vehicleId, status }),
     onSuccess: useInvalidateVehiclesOnSave(),
   })
 }

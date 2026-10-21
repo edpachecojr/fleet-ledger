@@ -1,4 +1,9 @@
-import { formatProvisionRate, presentVehicleActivity, presentVehicleStatus } from './vehicle'
+import {
+  formatProvisionRate,
+  isVehicleStatusFilter,
+  presentVehicleActivity,
+  presentVehicleStatus,
+} from './vehicle'
 
 describe('presentVehicleStatus', () => {
   it.each([
@@ -20,5 +25,12 @@ describe('presentVehicleActivity', () => {
 describe('formatProvisionRate', () => {
   it('formats reais per km', () => {
     expect(formatProvisionRate(0.15).replace(/\s/g, ' ')).toBe('R$ 0,15/km')
+  })
+})
+
+describe('isVehicleStatusFilter', () => {
+  it('accepts every status and "all", nothing else', () => {
+    expect(['all', 'Available', 'OnTrip', 'InMaintenance'].every(isVehicleStatusFilter)).toBe(true)
+    expect(isVehicleStatusFilter('Parked')).toBe(false)
   })
 })

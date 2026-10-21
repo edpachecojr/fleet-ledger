@@ -13,7 +13,7 @@ public sealed class ListVehiclesEndpoint : IEndpoint
     public static void Map(IEndpointRouteBuilder app)
         => app.MapGet("/", HandleAsync)
             .WithName("Vehicles: List")
-            .WithSummary("Lista veículos com busca por placa ou modelo")
+            .WithSummary("Lista veículos com busca por placa ou modelo e filtro por status")
             .WithDescription("allocatable=true devolve só os elegíveis para nova viagem (ativos e disponíveis).")
             .Produces<PagedResponse<List<Vehicle>>>(StatusCodes.Status200OK);
 
@@ -24,6 +24,7 @@ public sealed class ListVehiclesEndpoint : IEndpoint
         IVehicleHandler handler,
         CancellationToken cancellationToken,
         string? search = null,
+        EVehicleStatus? status = null,
         bool? isActive = null,
         bool allocatable = false,
         int pageNumber = PagingDefaults.PageNumber,
@@ -32,6 +33,7 @@ public sealed class ListVehiclesEndpoint : IEndpoint
         ListVehiclesRequest request = new()
         {
             Search = search,
+            Status = status,
             IsActive = isActive,
             Allocatable = allocatable,
             PageNumber = pageNumber,

@@ -16,4 +16,12 @@ public static class VehicleResponses
 
     public static Response<Vehicle?> DuplicatePlate(string plate)
         => new(null, StatusCodes.Status409Conflict, $"Já existe um veículo com a placa {plate}.");
+
+    public static Response<Vehicle?> StatusChangeBlockedOnTrip(string plate)
+        => new(null, StatusCodes.Status409Conflict,
+            $"O veículo {plate} está em viagem: o status só muda pelo fechamento ou cancelamento da viagem.");
+
+    public static Response<Vehicle?> StatusChangeBlockedInactive(string plate)
+        => new(null, StatusCodes.Status409Conflict,
+            $"O veículo {plate} está inativo. Reative-o antes de alterar o status operacional.");
 }

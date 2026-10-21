@@ -28,6 +28,13 @@ public interface IVehicleHandler
     /// <example><code>await handler.DeactivateAsync(request, cancellationToken);</code></example>
     Task<Response<Vehicle?>> DeactivateAsync(ByIdRequest request, CancellationToken cancellationToken);
 
+    /// <summary>
+    /// Troca manual entre Disponível e Em manutenção. 409 se o veículo está em viagem ou inativo;
+    /// pedir o status que ele já tem não muda nada.
+    /// </summary>
+    /// <example><code>await handler.ChangeStatusAsync(new ChangeVehicleStatusRequest { Id = id, Status = EVehicleStatus.InMaintenance }, cancellationToken);</code></example>
+    Task<Response<Vehicle?>> ChangeStatusAsync(ChangeVehicleStatusRequest request, CancellationToken cancellationToken);
+
     /// <summary>Reativa o veículo, mantendo o status operacional; repetir não muda nada.</summary>
     /// <example><code>await handler.ReactivateAsync(request, cancellationToken);</code></example>
     Task<Response<Vehicle?>> ReactivateAsync(ByIdRequest request, CancellationToken cancellationToken);

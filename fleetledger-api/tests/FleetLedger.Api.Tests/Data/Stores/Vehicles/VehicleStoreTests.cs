@@ -1,6 +1,7 @@
 using FleetLedger.Api.Data;
 using FleetLedger.Api.Data.Stores.Vehicles;
 using FleetLedger.Api.Tests.Fixtures;
+using FleetLedger.Core.Models;
 using FleetLedger.Core.Requests.Vehicles;
 using Microsoft.EntityFrameworkCore;
 
@@ -50,6 +51,14 @@ public class VehicleStoreTests
         string sql = ListSql(new ListVehiclesRequest { OrganizationId = _organizationId, IsActive = false });
 
         sql.Should().Contain("deactivated_at IS NULL");
+    }
+
+    [Fact]
+    public void ListQuery_WithStatus_FiltersByStatus()
+    {
+        string sql = ListSql(new ListVehiclesRequest { OrganizationId = _organizationId, Status = EVehicleStatus.InMaintenance });
+
+        sql.Should().MatchRegex(@"v\.status = @\w+");
     }
 
     private static string ListSql(ListVehiclesRequest request)

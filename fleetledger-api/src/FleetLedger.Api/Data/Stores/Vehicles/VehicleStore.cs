@@ -30,6 +30,8 @@ public sealed class VehicleStore(AppDbContext context) : IVehicleStore
         IQueryable<Vehicle> query = context.Vehicles.ForOrganization(request.OrganizationId).AsNoTracking();
         query = WithSearch(query, request.Search);
 
+        if (request.Status is EVehicleStatus status)
+            query = query.Where(vehicle => vehicle.Status == status);
         if (request.IsActive is bool isActive)
             query = query.Where(vehicle => (vehicle.DeactivatedAt == null) == isActive);
         if (request.Allocatable)

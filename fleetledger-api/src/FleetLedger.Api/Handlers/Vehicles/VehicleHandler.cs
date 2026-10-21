@@ -56,6 +56,26 @@ public sealed class VehicleHandler(
         return new PagedResponse<List<Vehicle>>(page.Items, page.TotalCount, request.EffectivePageNumber, request.EffectivePageSize);
     }
 
+    public async Task<Response<Vehicle?>> ChangeStatusAsync(ChangeVehicleStatusRequest request, CancellationToken cancellationToken)
+    {
+        Vehicle? vehicle = await store.FindAsync(request.OrganizationId, request.Id, cancellationToken);
+        if (vehicle is null)
+            return VehicleResponses.NotFound(request.Id);
+
+        EVehicleStatusChangeVerdict verdict = VehicleStatusTransition.Evaluate(vehicle, request.Status);
+        if (verdict != EVehicleStatusChangeVerdict.Allowed)
+            return RefusedStatusChange(vehicle, verdict);
+
+        EVehicleStatus previous = vehicle.Status;
+        vehicle.Status = request.Status;
+        vehicle.UpdatedAt = timeProvider.GetUtcNow();
+        await store.SaveChangesAsync(cancellationToken);
+
+        logger.LogInformation(
+            "Veículo {VehicleId} passou de {PreviousStatus} para {VehicleStatus}", vehicle.Id, previous, vehicle.Status);
+        return VehicleResponses.Found(vehicle);
+    }
+
     public async Task<Response<Vehicle?>> DeactivateAsync(ByIdRequest request, CancellationToken cancellationToken)
         => await ChangeActivityAsync(request, deactivate: true, cancellationToken);
 
@@ -78,6 +98,17 @@ public sealed class VehicleHandler(
 
         logger.LogInformation("Veículo {VehicleId} {VehicleActivity}", vehicle.Id, deactivate ? "inativado" : "reativado");
         return VehicleResponses.Found(vehicle);
+    }
+
+    private Response<Vehicle?> RefusedStatusChange(Vehicle vehicle, EVehicleStatusChangeVerdict verdict)
+    {
+        if (verdict == EVehicleStatusChangeVerdict.Unchanged)
+            return VehicleResponses.Found(vehicle);
+
+        logger.LogInformation("Troca de status do veículo {VehicleId} recusada: {StatusChangeVerdict}", vehicle.Id, verdict);
+        return verdict == EVehicleStatusChangeVerdict.BlockedOnTrip
+            ? VehicleResponses.StatusChangeBlockedOnTrip(vehicle.Plate)
+            : VehicleResponses.StatusChangeBlockedInactive(vehicle.Plate);
     }
 
     private Vehicle NewVehicle(CreateVehicleRequest request, string plate)

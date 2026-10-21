@@ -12,6 +12,7 @@ public static class VehicleEndpointGroup
             .MapEndpoint<ListVehiclesEndpoint>()
             .MapEndpoint<GetVehicleEndpoint>()
             .MapEndpoint<UpdateVehicleEndpoint>()
+            .MapEndpoint<ChangeVehicleStatusEndpoint>()
             .MapEndpoint<DeactivateVehicleEndpoint>()
             .MapEndpoint<ReactivateVehicleEndpoint>();
 }
