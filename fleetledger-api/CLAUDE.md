@@ -50,12 +50,14 @@ fleetledger-api/
 | Validador | `Core/Validators/<Modulo>/<Verbo><Entidade>Validator.cs` |
 | Contrato de handler | `Core/Handlers/I<Modulo>Handler.cs` |
 | Regra de negócio | `Api/Handlers/<Modulo>/<Modulo>Handler.cs` |
+| Acesso a dados do handler | `Api/Data/Stores/<Modulo>/I<Entidade>Store.cs` + `<Entidade>Store.cs` (EF) |
 | Rota HTTP | `Api/Endpoints/<Modulo>/<Verbo><Entidade>Endpoint.cs` |
 | Registro do grupo | `Api/Endpoints/<Modulo>/<Modulo>EndpointGroup.cs` |
 | Máquina de estados | `Api/Handlers/<Modulo>/<Entidade>StatusTransition.cs` |
 | Mapeamento EF | `Api/Data/Mappings/<Entidade>Mapping.cs` |
 | Configuração | `Api/Options/<Assunto>Options.cs` + `<Assunto>OptionsValidator.cs` |
 | Teste | `tests/FleetLedger.<Camada>.Tests/<mesmo caminho de origem>Tests.cs` |
+| Fake de store | `tests/FleetLedger.Api.Tests/Fakes/Fake<Entidade>Store.cs` |
 
 Arquivo fora do lugar é defeito, mesmo que compile.
 
@@ -166,9 +168,12 @@ Isolamento lógico por coluna, explícito, aplicado pela aplicação. A palavra
 3. `Core/Validators/<Modulo>/` — o validador
 4. `Core/Handlers/I<Modulo>Handler.cs` — assinatura com `CancellationToken`
 5. `Api/Data/Mappings/` + `dotnet ef migrations add <Nome>`
-6. `Api/Handlers/<Modulo>/` — regra, `ForOrganization`, log, `catch` tipado
-7. `Api/Endpoints/<Modulo>/` — rota com `ValidationFilter` + registro no grupo
-8. `tests/` — validador, handler (sucesso, não encontrado, isolamento entre organizações)
+6. `Api/Data/Stores/<Modulo>/` — store (interface + EF com `ForOrganization`); consultas
+   públicas para o teste conferir o SQL com `ToQueryString`
+7. `Api/Handlers/<Modulo>/` — regra sobre o store, log, `catch` tipado
+8. `Api/Endpoints/<Modulo>/` — rota com `ValidationFilter` + registro no grupo
+9. `tests/` — validador, handler com `Fake<Entidade>Store` (sucesso, não encontrado,
+   isolamento entre organizações), SQL do store (filtro `organization_id`)
 
 **Antes de declarar concluído:** `dotnet build` sem warning · `dotnet test`
 verde · `dotnet format --verify-no-changes` limpo · nenhum `catch` sem tipo ou

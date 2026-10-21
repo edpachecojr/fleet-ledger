@@ -23,10 +23,10 @@ Disponibilizar um Plano de Contas fixo e inflexível, base de classificação de
 - Contas de uso sistêmico (ex.: Provisão de manutenção, Adiantamento) não aparecem em seleções de lançamento manual.
 
 ## Critérios de aceite
-- [ ] Após a instalação, o plano de contas está disponível sem ação do usuário.
-- [ ] A tela de consulta lista grupos e contas em hierarquia.
-- [ ] Não há operação disponível (UI ou API) para alterar o plano de contas.
-- [ ] As listas de seleção de contas filtram corretamente por contexto de uso.
+- [x] Após a instalação, o plano de contas está disponível sem ação do usuário.
+- [x] A tela de consulta lista grupos e contas em hierarquia.
+- [x] Não há operação disponível (UI ou API) para alterar o plano de contas.
+- [x] As listas de seleção de contas filtram corretamente por contexto de uso.
 
 ## Observações
 Lista de contas acima aprovada pelo gestor (*Q9*).

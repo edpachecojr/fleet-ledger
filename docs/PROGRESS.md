@@ -9,13 +9,13 @@ Arquivo vivo: atualize ao iniciar, concluir ou bloquear uma tarefa, e ao tomar d
 | Marco | Tarefas | Concluídas | Status |
 |-------|---------|-----------:|--------|
 | M0 — Fundação | 001–002 | 2/2 | ✅ |
-| M1 — Cadastros | 003–007 | 0/5 | ⬜ |
+| M1 — Cadastros | 003–007 | 1/5 | 🟨 |
 | M2 — Financeiro base | 008–010 | 0/3 | ⬜ |
 | M3 — Viagens | 011–018 | 0/8 | ⬜ |
 | M4 — Faturamento | 019–024 | 0/6 | ⬜ |
 | M5 — Manutenção | 025–027 | 0/3 | ⬜ |
 | M6 — Resultados | 028–032 | 0/5 | ⬜ |
-| **Total** | | **2/32** | |
+| **Total** | | **3/32** | |
 
 ## Tarefas
 
@@ -23,7 +23,7 @@ Arquivo vivo: atualize ao iniciar, concluir ou bloquear uma tarefa, e ao tomar d
 |----|--------|--------|--------|-----------|-------------|
 | TASK-001 | Estrutura base da aplicação executável | ✅ | 2026-10-20 | 2026-10-20 | API (`fleetledger-api/`) + backoffice (`fleetledger-backoffice-web/`) + banco com `docker compose up --build`. CI ainda não configurado. |
 | TASK-002 | Login do administrador e proteção de acesso | ✅ | 2026-10-20 | 2026-10-20 | `POST /v1/auth/login` (JWT 8 h, bloqueio 15 min após 5 erros), seed do administrador, tela de login, rotas protegidas, logout e expiração no backoffice. ADR 0007. |
-| TASK-003 | Plano de Contas padrão | ⬜ | | | |
+| TASK-003 | Plano de Contas padrão | ✅ | 2026-10-21 | 2026-10-21 | 7 grupos e 18 contas globais gravados pela migration `AddChartOfAccounts`; `GET /v1/ledger-accounts` (hierarquia) e `GET /v1/ledger-accounts/selectable?entryContext=` (seleção por contexto); tela "Plano de contas" somente leitura. |
 | TASK-004 | Cadastro de veículos | ⬜ | | | |
 | TASK-005 | Status operacional do veículo e bloqueio de alocação | ⬜ | | | |
 | TASK-006 | Cadastro de clientes | ⬜ | | | |
@@ -81,6 +81,14 @@ Registre aqui as respostas às questões em aberto do [backlog](backlog/README.m
 | 2026-10-20 | TASK-002 | Backoffice guarda o token em **`sessionStorage`** (sobrevive ao F5, some ao fechar a aba). | 002 |
 | 2026-10-20 | ADR 0007 | Sessão do administrador: JWT 8 h sem refresh, logout no cliente, lockout do Identity, seed por configuração, token em `sessionStorage`. | 002 |
 | 2026-10-20 | ADR 0006 | Front-end: SPA React 19 + Vite, React Router, TanStack Query, cliente gerado do OpenAPI, design system Backoffice com Tailwind 4; nginx faz proxy de `/api`. | todas |
+| 2026-10-21 | M1 | Handlers dependem de um **store por módulo** (`I<Entidade>Store` em `Api/Data/Stores/<Modulo>/`, implementação EF com `ForOrganization`); testes de handler usam `Fake<Entidade>Store` e o SQL do store é conferido offline com `ToQueryString` (ADR 0004). | 003–007 |
+| 2026-10-21 | TASK-003 | Plano de Contas **global** (não pertence a organização), gravado pela própria migration (`HasData`); códigos hierárquicos (`1`, `1.01`…) na ordem da DRE. | 003 |
+| 2026-10-21 | TASK-003 | Contexto de lançamento manual por conta: **Viagem** (combustível, pedágio, chapas/descarga, alimentação/diárias, outras despesas de viagem), **Despesa fixa** (seguro, IPVA/licenciamento, aluguel, rastreamento, salários fixos, outros custos fixos), **Manutenção** (manutenção realizada), **Faturamento** (frete, descontos concedidos, acréscimos cobrados). Sistêmicas: comissão/remuneração, provisão de manutenção, adiantamento a motorista. | 003, 010, 015, 020, 027 |
+| 2026-10-21 | M1 | Veículos, clientes e motoristas inativados **podem ser reativados** (ação "Reativar"). | 004, 006, 007 |
+| 2026-10-21 | TASK-004 | Capacidade do veículo em **kg** (inteiro); **placa não é editável** depois do cadastro. | 004 |
+| 2026-10-21 | TASK-006 | Cliente: só razão social, CNPJ e ciclo são obrigatórios; nome fantasia, telefone, e-mail e prazo são opcionais (validados quando informados). | 006 |
+| 2026-10-21 | TASK-007 | Motorista: categoria da CNH em lista fixa (A, B, C, D, E, AB, AC, AD, AE), número da CNH com 11 dígitos, telefone obrigatório, dados bancários/PIX em texto livre opcional. Situação documental: **Vencido** se alguma validade < hoje; **Vencendo** se a mais próxima vence entre hoje e hoje+30 dias (inclusive); senão **Regular**; vale o pior documento, calculado no servidor. | 007, 011 |
+| 2026-10-21 | M1 | Cadastro e edição em **páginas próprias** (`/veiculos`, `/veiculos/novo`, `/veiculos/:id`…), formulário num Card como no card FormControls. | 004, 006, 007 |
 
 ## Diário
 
@@ -100,3 +108,11 @@ Registro cronológico do que foi feito, problemas e próximos passos.
 - CA1873 desligada junto com a CA1848 no `.editorconfig` da API (mesma decisão: logs com message template, sem `LoggerMessage`).
 - Observação: o login com e-mail inexistente responde mais rápido que com senha errada (não calcula hash). Com um único administrador o risco de enumeração é baixo; revisitar se houver cadastro de usuários.
 - **Marco M0 concluído.** **Próximo passo:** M1 — TASK-003 (Plano de Contas padrão).
+
+### 2026-10-21
+- Commits da TASK-002 feitos (`bc03fff`, `32c3f7b`); o push ficou pendente: o WSL não tem credencial do GitHub. Decisão: seguir commitando por tarefa e o push sai quando houver credencial.
+- Dúvidas da M1 respondidas pelo gestor (ver Decisões de 2026-10-21).
+- TASK-003 iniciada.
+- TASK-003 concluída. API: `LedgerAccountGroup`/`LedgerAccount` (globais, sem organização) com `ChartOfAccountsCatalog` gravado por `HasData` na migration `AddChartOfAccounts`; contexto de lançamento manual em `ELedgerEntryContext` (nulo = sistêmica). Endpoints só de leitura: `GET /v1/ledger-accounts` e `GET /v1/ledger-accounts/selectable?entryContext=` (POST responde 405). Primeiro módulo com o padrão de store (`ILedgerAccountStore` + `FakeLedgerAccountStore`); `CLAUDE.md` da API atualizado. Backoffice: componente `DataTable` do design system e página "Plano de contas" (um Card por grupo, conta sistêmica com badge "Sistêmica"), item no menu "Financeiro". `dotnet test`: 132 testes; `pnpm test`: 83 testes. Conferido no compose.
+- Correção: parâmetro de query ausente/inválido (`BadHttpRequestException`) respondia 500; agora o `UseExceptionHandler` usa o status da exceção (400). Teste de regressão em `HttpContractExtensionTests`.
+- As listas de seleção de conta no backoffice serão montadas nas telas que lançam (TASK-010, 015, 020, 027), consumindo `/selectable`.
