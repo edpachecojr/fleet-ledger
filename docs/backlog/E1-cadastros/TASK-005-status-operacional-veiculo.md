@@ -16,7 +16,7 @@ Controlar o status operacional (Disponível, Em Viagem, Em Manutenção) e imped
 - Somente veículos ativos e "Disponível" são elegíveis para alocação.
 
 ## Critérios de aceite
-- [ ] O administrador altera um veículo Disponível para Em Manutenção e vice-versa.
-- [ ] A tentativa de alterar manualmente para/desde "Em Viagem" é bloqueada.
-- [ ] Um veículo Em Manutenção não aparece/é rejeitado na abertura de viagem (validado também na API).
-- [ ] A listagem permite filtrar por status.
+- [x] O administrador altera um veículo Disponível para Em Manutenção e vice-versa.
+- [x] A tentativa de alterar manualmente para/desde "Em Viagem" é bloqueada.
+- [x] Um veículo Em Manutenção não aparece/é rejeitado na abertura de viagem (validado também na API).
+- [x] A listagem permite filtrar por status.

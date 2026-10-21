@@ -9,13 +9,13 @@ Arquivo vivo: atualize ao iniciar, concluir ou bloquear uma tarefa, e ao tomar d
 | Marco | Tarefas | Concluídas | Status |
 |-------|---------|-----------:|--------|
 | M0 — Fundação | 001–002 | 2/2 | ✅ |
-| M1 — Cadastros | 003–007 | 2/5 | 🟨 |
+| M1 — Cadastros | 003–007 | 3/5 | 🟨 |
 | M2 — Financeiro base | 008–010 | 0/3 | ⬜ |
 | M3 — Viagens | 011–018 | 0/8 | ⬜ |
 | M4 — Faturamento | 019–024 | 0/6 | ⬜ |
 | M5 — Manutenção | 025–027 | 0/3 | ⬜ |
 | M6 — Resultados | 028–032 | 0/5 | ⬜ |
-| **Total** | | **4/32** | |
+| **Total** | | **5/32** | |
 
 ## Tarefas
 
@@ -25,7 +25,7 @@ Arquivo vivo: atualize ao iniciar, concluir ou bloquear uma tarefa, e ao tomar d
 | TASK-002 | Login do administrador e proteção de acesso | ✅ | 2026-10-20 | 2026-10-20 | `POST /v1/auth/login` (JWT 8 h, bloqueio 15 min após 5 erros), seed do administrador, tela de login, rotas protegidas, logout e expiração no backoffice. ADR 0007. |
 | TASK-003 | Plano de Contas padrão | ✅ | 2026-10-21 | 2026-10-21 | 7 grupos e 18 contas globais gravados pela migration `AddChartOfAccounts`; `GET /v1/ledger-accounts` (hierarquia) e `GET /v1/ledger-accounts/selectable?entryContext=` (seleção por contexto); tela "Plano de contas" somente leitura. |
 | TASK-004 | Cadastro de veículos | ✅ | 2026-10-21 | 2026-10-21 | CRUD em `/v1/vehicles` (sem DELETE: inativar/reativar), placa antiga/Mercosul única por organização, busca por placa/modelo, `allocatable=true` para seleção de nova viagem; telas `/veiculos`, `/veiculos/novo`, `/veiculos/:id`. |
-| TASK-005 | Status operacional do veículo e bloqueio de alocação | ⬜ | | | |
+| TASK-005 | Status operacional do veículo e bloqueio de alocação | ✅ | 2026-10-21 | 2026-10-21 | `PUT /v1/vehicles/{id}/status` (Disponível ↔ Em manutenção; Em viagem 400; veículo em viagem ou inativo 409), filtro `status` na listagem, `VehicleAllocationRule` reutilizável; ações e badges no backoffice. |
 | TASK-006 | Cadastro de clientes | ⬜ | | | |
 | TASK-007 | Cadastro de motoristas | ⬜ | | | |
 | TASK-008 | Contas a Pagar: títulos e consulta | ⬜ | | | |
@@ -122,3 +122,6 @@ Registro cronológico do que foi feito, problemas e próximos passos.
 - TASK-004 iniciada.
 - TASK-004 concluída. API: `Vehicle` (`IOrganizationOwned`, placa normalizada imutável, hodômetro atual só pelo sistema, `DeactivatedAt` + `IsActive` derivado), migration `AddVehicles` com índice único `organization_id + plate`; `VehicleStore` com busca ILIKE escapada (`SearchPattern`) e paginação limitada no servidor (`PagedRequest.Effective*`); `VehicleAllocationRule` (ativo e Disponível) usada pelo filtro `allocatable`; `ByIdRequest` genérico para rotas por id. Backoffice: componentes `TextField` com erro, `SelectField`, `ToolbarSearch`, `TablePagination`, `ConfirmDialog`, `ButtonLink`, `InlineMessage`; `useMutationForm` + `outcomeOf` (400 por campo, 404/409 com mensagem) e `listQuery` (busca, situação, página) para os próximos cadastros; menu "Cadastros › Veículos" ativo também nas subrotas. `dotnet test`: 192 testes; `pnpm test`: 146 testes. Conferido no compose (201, 409, 400 por campo, busca, inativação fora de `allocatable`, DELETE 405).
 - A seleção de veículo na abertura de viagem (TASK-011) vai consumir `GET /v1/vehicles?allocatable=true`.
+- TASK-005 iniciada.
+- TASK-005 concluída. API: `ChangeVehicleStatusRequest` + validador (só Available/InMaintenance como destino manual), máquina de estados `VehicleStatusTransition` (inativo → 409 "reative antes", em viagem → 409, mesmo status → sem gravar), filtro `status` em `GET /v1/vehicles`. Backoffice: ações "Colocar em manutenção" / "Liberar para uso" no detalhe (nenhuma em viagem ou inativo), filtro de status na lista (`ToolbarFilter`), badge de status com cor de status (verde, azul, âmbar). `dotnet test`: 208 testes; `pnpm test`: 156 testes. Conferido no compose.
+- Critério "veículo Em Manutenção é rejeitado na abertura de viagem (API)": a regra (`VehicleAllocationRule`) e a lista de elegíveis (`allocatable=true`) estão prontas; a recusa no `POST` de viagem entra com a TASK-011, que a reutiliza.
