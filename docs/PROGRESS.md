@@ -88,6 +88,7 @@ Registre aqui as respostas às questões em aberto do [backlog](backlog/README.m
 | 2026-10-21 | TASK-004 | Capacidade do veículo em **kg** (inteiro); **placa não é editável** depois do cadastro. | 004 |
 | 2026-10-21 | TASK-006 | Cliente: só razão social, CNPJ e ciclo são obrigatórios; nome fantasia, telefone, e-mail e prazo são opcionais (validados quando informados). | 006 |
 | 2026-10-21 | TASK-007 | Motorista: categoria da CNH em lista fixa (A, B, C, D, E, AB, AC, AD, AE), número da CNH com 11 dígitos, telefone obrigatório, dados bancários/PIX em texto livre opcional. Situação documental: **Vencido** se alguma validade < hoje; **Vencendo** se a mais próxima vence entre hoje e hoje+30 dias (inclusive); senão **Regular**; vale o pior documento, calculado no servidor. | 007, 011 |
+| 2026-10-21 | M1 | Gestor **aceitou a M1 como entregue** com os commits das tarefas enviados num único push (os pushes por tarefa falharam por falta de credencial no WSL). Próximas tarefas: push individual logo após a validação. | 003–007 |
 | 2026-10-21 | M1 | Cadastro e edição em **páginas próprias** (`/veiculos`, `/veiculos/novo`, `/veiculos/:id`…), formulário num Card como no card FormControls. | 004, 006, 007 |
 | 2026-10-21 | TASK-004 | Hodômetro em **km inteiro**; taxa de provisão em **R$/km com 2 casas**; veículo pode ser **inativado em qualquer status** (o status é mantido). | 004, 017, 028 |
 | 2026-10-21 | TASK-005 | Veículo **inativo não muda de status operacional**: reative antes. | 005 |
@@ -134,4 +135,5 @@ Registro cronológico do que foi feito, problemas e próximos passos.
 - Registros de teste criados nas verificações ao vivo (2 veículos, 1 cliente, 1 motorista) removidos do banco local do compose.
 - Push feito com o Git Credential Manager do Windows (`442f4aa..adbdbe2`); os commits das tarefas subiram juntos porque os pushes anteriores falharam por falta de credencial.
 - Conferência visual das telas da M1 com Chromium headless (claro, escuro, 1440 px e 375 px). Dois desvios do card DataTable corrigidos: a página rolava de lado no celular (o `<main>` deixava o card crescer com a tabela) e as colunas secundárias não sumiam abaixo de 1024 px; no Plano de contas, as colunas ficaram com largura fixa para os grupos alinharem. Dados de exemplo usados nas capturas removidos do banco local.
+- Gestor aceitou a M1 como entregue, com os pushes agrupados (ver Decisões).
 - **Marco M1 concluído.** **Próximo passo:** M2 — TASK-008 (Contas a Pagar).
